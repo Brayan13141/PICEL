@@ -2,6 +2,12 @@ html {
     min-height: 100%;
     position: relative;
 }
+
+.contenedorfoo{
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
 body {
     margin: 0;
 }
@@ -36,6 +42,10 @@ footer {
 }
 .btn-picel{
     background-color: #5FBC18;
+    color: #fff;
+}
+.btn-picel-Cancel{
+    background-color: #676767;
     color: #fff;
 }
 
