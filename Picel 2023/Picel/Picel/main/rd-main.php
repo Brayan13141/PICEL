@@ -5,6 +5,7 @@ if ($_SESSION['tipo_us'] != "Admin") {
 }
 if ($_SESSION['id_User']) {
   include('../system/conexion.php');
+  $_SESSION['ID_ACCION'] = 0
 ?>
   <!DOCTYPE html>
   <html lang="en">
@@ -16,8 +17,8 @@ if ($_SESSION['id_User']) {
     <link rel="icon" href="../ico/logo.ico">
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/estilo.css?v=<?php echo time(); ?>" rel="stylesheet">
-    <script src="../js/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/jquery-3.6.0.min.js"></script> <!-- jQuery -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
   </head>
 
@@ -37,7 +38,6 @@ if ($_SESSION['id_User']) {
         <div class="grid mx-auto col-md-12">
           <?php
           $query = "SELECT * FROM docentes";
-          $query2 = "DELETE FROM docentes where id_ Usuario = ";
           echo '<table class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
           <tr> 
               <td><p>Nombre</p></td> 
@@ -59,15 +59,32 @@ if ($_SESSION['id_User']) {
                         <td>' . $carrer_doc . '</td> 
                         <td>' . $tel_doc . '</td>
                         <td>
-                        <button type="submit" class="btn btn-sm btn-primary" onclick="editarDocente(' . $id_doc . ')">Editar</button>
-  <button type="button" class="btn btn-sm btn-danger" onclick="eliminarRegistro('.$id_doc.');">Eliminar</button>                
-                        </td> 
+                        <button type="button" class="btn btn-sm btn-primary" onclick="editarDocente(' . $id_doc . ')">Editar</button>
+                        <button type="button" id="btnEliminar" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar</button>
+                       </td> 
                     </tr>';
             }
             echo "</table>";
             $result->free();
           }
           ?>
+        </div>
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                ¿Estás seguro de que quieres eliminar este elemento?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete" onclick="eliminarDocente(<?php echo $id_doc; ?>)">Eliminar</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="row" style="display:none;visibility:hidden;" id="registrar">
@@ -94,12 +111,12 @@ if ($_SESSION['id_User']) {
               <div class="mb-3 col-6">
                 <label for="carrera-c" class="form-label">Carrera</label>
                 <select name="carrera" class="form-control" id="carrera-c">
-                  <option value="SISTEMAS COMPUTACIONALES">ING SISTEMAS COMPUTACIONALES</option>
-                  <option value="AMBIENTAL">ING AMBIENTAL</option>
-                  <option value="INDUSTRIAL">ING INDUSTRIAL</option>
-                  <option value="GESTION EMPRESARIAL">ING GESTION EMPRESARIAL</option>
-                  <option value="ELECTRONICA">ING ELECTRONICA</option>
-                  <option value="SISTEMAS AUTOMOTRICES">ING SISTEMAS AUTOMOTRICES</option>
+                  <option value="ING SISTEMAS COMPUTACIONALES">ING SISTEMAS COMPUTACIONALES</option>
+                  <option value="ING AMBIENTAL">ING AMBIENTAL</option>
+                  <option value="ING INDUSTRIAL">ING INDUSTRIAL</option>
+                  <option value="ING GESTION EMPRESARIAL">ING GESTION EMPRESARIAL</option>
+                  <option value="ING ELECTRONICA">ING ELECTRONICA</option>
+                  <option value="ING SISTEMAS AUTOMOTRICES">ING SISTEMAS AUTOMOTRICES</option>
                   <option value="GASTRONOMIA">GASTRONOMIA</option>
                 </select>
               </div>
@@ -131,40 +148,53 @@ if ($_SESSION['id_User']) {
                 <input type="password" class="form-control" id="password-c" name="password">
               </div>
             </div>
-            <div class="pt-2 d-flex justify-content-center">
+            <div class="pt-2 d-flex justify-content-around">
               <button type="submit" class="btn btn-picel">Registrar</button>
+              <button type="button" class="btn btn-picel-Cancel" onclick="cancel()">Cancelar</button>
             </div>
           </form>
         </div>
       </div>
     </div>
     <?php
-    if (isset($_GET['r'])) {
+    if (isset($_GET['mensaje'])) {
     ?>
-      <div class="modal fade" id="modalStatus" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content" style="background: #ffffff;margin-top: 40%;overflow-y: auto;">
-            <div class="modal-header" style="border-bottom: none;text-align: center;">
-              <h5 class="modal-title" id="lbproverData" style="color: green;font-size: 20px"><?php echo base64_decode($_GET['r']); ?></h5>
-              <button type="button" class="btn btn-danger" onclick="reload_box();" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
+      <div class="modal fade" id="ModalMensaje" tabindex="-3">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Mensaje</h5>
             </div>
-
+            <div class="modal-body">
+              <p id="LabelModal"><?php
+                                  if (isset($_GET['mensaje'])) {
+                                    echo $_GET['mensaje'];
+                                  } else {
+                                    echo "";
+                                  }
+                                  ?></p>
+            </div>
+            <div class="modal-footer">
+              <h6>Da clic fuera del mensaje para continuar</h6>
+            </div>
           </div>
         </div>
       </div>
-      <script>
-        $(document).ready(function() {
-          $('#modalStatus').modal('toggle');
-        });
-
-        function reload_box() {
-          location.href = 'rd-main.php';
-        }
-      </script>
     <?php
+      echo '
+     <script>
+       // Esperamos a que el documento se haya cargado completamente
+       document.addEventListener("DOMContentLoaded", function() {
+         // Seleccionamos el modal
+         var modal = new bootstrap.Modal(document.getElementById("ModalMensaje"));
+         // Mostramos el modal
+         modal.show();
+       });
+     </script>';
     }
     ?>
     <?php
+
     include('footer.php');
     ?>
     <script>
@@ -173,35 +203,93 @@ if ($_SESSION['id_User']) {
           document.getElementById("registros").style = "display:block;visibility:visible;";
           document.getElementById("registrar").style = "display:none;visibility:hidden;";
         } else {
+          <?php $_SESSION['ID_ACCION'] = 0 ?>
+          $('#nombre-c').val("");
+          $('#apellidoP-c').val("");
+          $('#apellidoM-c').val("");
+          $('#carrera-c').val("");
+          $('#correo-c').val("");
+          $('#telefono-c').val("");
+          $('#usuario-c').val("");
+          $('#password-c').val("");
           document.getElementById("registrar").style = "display:block;visibility:visible;";
           document.getElementById("registros").style = "display:none;visibility:hidden;";
         }
       }
-      
-      function eliminarRegistro(idRegistro) {
+
+      function eliminarDocente(idRegistro) {
         // Eliminar el registro con ID "idRegistro" de la base de datos
-         try{
+        try {
           $.ajax({
-          url: "../system/sm_rd.php",
-          type: "POST",
-          data: {
-            accion: "eliminar_registro",
-            id_registro: parseInt(idRegistro)
-          },
-          success: function(respuesta) {
-            alert(respuesta.success)
-              // Eliminar la  fila de la tabla
-            //  $('#RESPUESTA').html(respuesta.RESPUESTA);
-              console.log("SE ELIMINO CORRECTAMENTE")
-          }
-        });
-         }catch(e){
+            url: "../system/sm_rd.php",
+            type: "POST",
+            data: {
+              accion: "eliminar_registro",
+              id_registro: parseInt(idRegistro)
+            },
+            success: function(respuesta) {
+              window.location.href = "./rd-main.php?mensaje=SE ELIMINO CORRECTAMENTE";
+            }
+          });
+        } catch (e) {
           //$('#RESPUESTA').html(respuesta.RESPUESTA);
-             alert("Error al eliminar el registro" + e);
-         }
-      
+          alert("Error al eliminar el registro" + e);
+        }
+
+      }
+
+      function editarDocente(idRegistro) {
+        try {
+          $.ajax({
+            url: "../system/sm_rd.php",
+            type: "POST",
+            data: {
+              accion: "editar_registro",
+              id_registro: parseInt(idRegistro)
+            },
+            success: function(respuesta) {
+              var datos = JSON.parse(respuesta);
+              var docente = datos.DOCENTE;
+              load(1);
+              $('#nombre-c').val(docente.nombre);
+              $('#apellidoP-c').val(docente.apellidoP);
+              $('#apellidoM-c').val(docente.apellidoM);
+              $('#carrera-c').val(docente.carrera);
+              $('#correo-c').val(docente.correo);
+              $('#telefono-c').val(docente.num_celular);
+              $('#usuario-c').val(docente.usuario);
+              $('#password-c').val(docente.contrasena);
+            }
+          });
+        } catch (e) {
+          //$('#RESPUESTA').html(respuesta.RESPUESTA);
+          alert("Error al editar el registro: " + e);
+        }
+
+      }
+
+      $(document).ready(function() {
+        $('#modalStatus').modal('toggle');
+      });
+
+      function cancel() {
+        try {
+          $.ajax({
+            url: "../system/sm_rd.php",
+            type: "POST",
+            data: {
+              cancel: true
+            },
+            success: function(respuesta) {
+            }
+          });
+        } catch (e) { 
+          alert("Error" + e);
+        }
+        location.href = 'rd-main.php';
       }
     </script>
+
   </body>
 
   </html>
