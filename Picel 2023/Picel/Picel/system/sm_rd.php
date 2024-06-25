@@ -1,6 +1,8 @@
 <?php
 include("../system/encryptPSA.php");
 include("../system/conexion.php");
+session_start();
+
 function antiscript($data)
 {
     $data = trim($data);
@@ -8,26 +10,45 @@ function antiscript($data)
     $data = htmlspecialchars($data);
     return $data;
 }
-
-if(isset($_POST['accion']))
+if(isset($_POST['cancel']) && $_POST['cancel'] = true)
 {
-    try {
-        //echo($_POST['accion'].' '.$_POST['id_registro']);
-        $BORRAR_DOCENTE = "DELETE FROM docentes WHERE id_Docente =".$_POST['id_registro'];
-
-        if($link->query($BORRAR_DOCENTE)) {
-            echo json_encode(array("success" => true));
-        } else {
-            echo('ERRO AL BORRAR DOCENTE');
-        }
-} catch (Exception $e) {
-    // Manejo de excepciones
-    echo "Error: " . $e->getMessage();
-} 
+    $_SESSION['editar'] ='';
+    $_SESSION['IdEditar'] ='';
+    header('Location: ../main/rd-main.php');
+    exit();
 }
 
+if (
+    isset($_POST['accion'])  && isset($_POST['id_registro']) &&
+    (isset($_POST['accion']) == "eliminar_registro" || isset($_POST['accion']) == "editar_registro")
+) {
+    try {
+        if ($_POST['accion'] == "eliminar_registro") {
+            $BORRAR_DOCENTE = "DELETE FROM docentes WHERE id_Docente =" . $_POST['id_registro'];
+            if ($link->query($BORRAR_DOCENTE)) {
+                echo json_encode(array("success" => true));
+            } else {
+                echo ('ERROR AL BORRAR DOCENTE');
+            }
+        } else {
+            $RESULTADO_DOCENTE = "SELECT * FROM docentes  
+                      JOIN usuarios ON docentes.id_User = usuarios.id_User 
+                      WHERE docentes.id_Docente =" . $_POST['id_registro'];
+            if ($resultado = $link->query($RESULTADO_DOCENTE)) {
+                $docente = $resultado->fetch_assoc();
+                $_SESSION['editar'] = true;
+                $_SESSION['idEditar'] =  $_POST['id_registro']; 
+                echo json_encode(array("success" => true, "DOCENTE" => $docente));
+            } else {
+                echo ('ERROR AL ACTUALIZAR');
+            }
+        }
+    } catch (Exception $e) {
+        // Manejo de excepciones
+        echo "Error: " . $e->getMessage();
+    }
+}
 
-//docente adminsitrador
 if (
     isset($_POST['nombre']) && !empty($_POST['nombre']) &&
     isset($_POST['apellidoP']) && !empty($_POST['apellidoP']) &&
@@ -51,8 +72,6 @@ if (
     $sql = "SELECT * FROM docentes WHERE correo = '$correo'";
     $complet = $link->query($sql);
     if (mysqli_num_rows($complet) == 0) {
-        var_dump($_POST['tipo']);
-        var_dump($_POST['nombre']);
         if ($tipo == "1") {
             $insert1 = "INSERT INTO usuarios(usuario, contrasena, tipo_us) 
             VALUES ('$usuario','$password','Docente')";
@@ -61,14 +80,12 @@ if (
                 VALUES ( (SELECT id_User FROM USUARIOS
                 ORDER BY id_User DESC LIMIT 1 ),
                 '$nombre','$apellidoP','$apellidoM','$correo','$carrera','$num_celular')";
-                //var_dump($insert2);
-                var_dump($link->query($insert2));
                 if ($link->query($insert2)) {
-                    var_dump("ENTRO");
-                    $error2 = base64_encode("Se ha hecho el registrado correctamente");
-                    echo "<script>location.href='../main/rd-main.php?r=$error2'</script>";
+                    header('Location: ../main/rd-main.php?mensaje=Se ha registrado correctamente');
+                    exit();
                 } else {
-                    var_dump("NO ENTRO");
+                    header('Location: ../main/rd-main.php?mensaje= Registro incorrecto');
+                    exit();
                 }
             }
         } else {
@@ -80,16 +97,42 @@ if (
                 ORDER BY id_User DESC
                 LIMIT 1 ),'$nombre','$apellidoP','$apellidoM','$correo','$carrera','$num_celular')";
                 if ($link->query($insert2)) {
-                    $error2 = base64_encode("Se ha registrado correctamente");
-                    echo "<script>location.href='../main/rd-main.php?r=$error2'</script>";
+                    header('Location: ../main/rd-main.php?mensaje=Se ha registrado correctamente');
+                    exit();
                 }
             }
         }
+    } else if (isset($_SESSION['editar']) &&  $_SESSION['editar'] = true && isset( $_SESSION['idEditar'])) {
+        try{
+            $update = "UPDATE docentes SET nombre = '$nombre', apellidoP = '$apellidoP', apellidoM = '$apellidoM', carrera = '$carrera', correo = '$correo', num_celular = '$num_celular' WHERE id_Docente = " . $_SESSION['idEditar'];
+            if ($link->query($update)) {
+                $_SESSION['editar'] ='';
+                $_SESSION['IdEditar'] ='';
+                header('Location: ../main/rd-main.php?mensaje=Se ha actualizado correctamente');
+                exit();
+            } else {
+                header('Location: ../main/rd-main.php?mensaje=Error al actualizar el docente');
+                exit();
+            }
+        }catch(Exception $e)
+        {
+            echo "Error: " . $e->getMessage();
+        }
+   
     } else {
-        $error2 = base64_encode("Este docente ya existe");
-        echo "<script>location.href='../main/rd-main.php?r=$error2'</script>";
+        header('Location: ../main/rd-main.php?mensaje=Este docente ya existe'.$_SESSION['editar']);
+        exit();
     }
 } else {
-    $error2 = base64_encode("No dejes campos vacíos");
-    echo "<script>location.href='../main/rd-main.php?r=$error2'</script>";
+    //LOS MENSAJES SE GUARDAN EN LA VARIABLE DE SESION, SE RECARGA LA PAGINA. SI HAY MENSAJE SE MUESTRA
+    //VALIDACION PARA QUE NO INTERVENGA CON LA FUNCIONALIDAD DE EDITAR Y ELIMINAR
+    if (
+        isset($_POST['accion'])  && isset($_POST['id_registro']) &&
+        (isset($_POST['accion']) == "eliminar_registro" || isset($_POST['accion']) == "editar_registro")
+    ) {
+        //NO SE REALIZA NADA
+    } else {
+        header('Location: ../main/rd-main.php?mensaje=No dejes campos vacíos');
+        exit();
+    }
 }
