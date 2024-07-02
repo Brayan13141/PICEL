@@ -1,5 +1,28 @@
-<?php
-include("../system/encryptPSA.php");
+<?php 
+/*
+ * It handles various operations related to docentes (teachers) in the system.
+ * 
+ * Functions:
+ * - antiscript($data): A helper function that sanitizes the input data by removing leading/trailing spaces, backslashes, and converting special characters to HTML entities.
+ * 
+ * Actions:
+ * - Cancel: If the 'cancel' POST parameter is set to true, it clears the session variables 'editar' and 'IdEditar' and redirects to ../main/rd-main.php.
+ * - Eliminar Registro: If the 'accion' and 'id_registro' POST parameters are set and 'accion' is equal to "eliminar_registro", it deletes the docente record with the specified 'id_registro' from the 'docentes' table.
+ * - Editar Registro: If the 'accion' and 'id_registro' POST parameters are set and 'accion' is equal to "editar_registro", it retrieves the docente record with the specified 'id_registro' from the 'docentes' table and stores it in the session variables 'editar' and 'idEditar'.
+ * - Registrar Docente: If all the required POST parameters (nombre, apellidoP, apellidoM, carrera, correo, telefono, usuario, tipo, password) are set and not empty, it inserts a new docente record into the 'docentes' table along with the corresponding user record in the 'usuarios' table.
+ * - Actualizar Docente: If the session variables 'editar' and 'idEditar' are set, it updates the docente record with the specified 'idEditar' in the 'docentes' table.
+ * 
+ * Redirects:
+ * - If an error occurs during the database operations, it redirects to ../main/rd-main.php with an appropriate error message.
+ * - If the registration or update is successful, it redirects to ../main/rd-main.php with a success message.
+ * - If there are empty fields in the registration form, it redirects to ../main/rd-main.php with a message indicating that fields should not be left empty.
+ * - If a docente with the same correo already exists and it's not an edit operation, it redirects to ../main/rd-main.php with a message indicating that the docente already exists.
+ * 
+ * Note: This code assumes the existence of a database connection object named $link, which is used to perform database operations.
+ */
+?>
+
+<?php 
 include("../system/conexion.php");
 session_start();
 
@@ -19,33 +42,37 @@ if(isset($_POST['cancel']) && $_POST['cancel'] = true)
 }
 
 if (
-    isset($_POST['accion'])  && isset($_POST['id_registro']) &&
+    isset($_POST['accion']) && isset($_POST['id_registro']) &&
     (isset($_POST['accion']) == "eliminar_registro" || isset($_POST['accion']) == "editar_registro")
 ) {
     try {
         if ($_POST['accion'] == "eliminar_registro") {
-            $BORRAR_DOCENTE = "DELETE FROM docentes WHERE id_Docente =" . $_POST['id_registro'];
+            $id_registro = antiscript($_POST['id_registro']);
+            $BORRAR_DOCENTE = "DELETE FROM docentes WHERE id_Docente =" . $id_registro;
             if ($link->query($BORRAR_DOCENTE)) {
                 echo json_encode(array("success" => true));
             } else {
-                echo ('ERROR AL BORRAR DOCENTE');
+                header('Location: ../main/rd-main.php?mensaje=ERROR AL BORRAR EL DOCENTE');
+                
             }
         } else {
+            $id_registro = antiscript($_POST['id_registro']);
             $RESULTADO_DOCENTE = "SELECT * FROM docentes  
                       JOIN usuarios ON docentes.id_User = usuarios.id_User 
-                      WHERE docentes.id_Docente =" . $_POST['id_registro'];
+                      WHERE docentes.id_Docente =" . $id_registro;
             if ($resultado = $link->query($RESULTADO_DOCENTE)) {
                 $docente = $resultado->fetch_assoc();
                 $_SESSION['editar'] = true;
-                $_SESSION['idEditar'] =  $_POST['id_registro']; 
+                $_SESSION['idEditar'] = $id_registro;
                 echo json_encode(array("success" => true, "DOCENTE" => $docente));
             } else {
-                echo ('ERROR AL ACTUALIZAR');
+                header('Location: ../main/rd-main.php?mensaje=ERROR AL ACTUALIZAR');
+                
             }
         }
     } catch (Exception $e) {
-        // Manejo de excepciones
-        echo "Error: " . $e->getMessage();
+
+        header('Location: ../main/rd-main.php?mensaje='.$e->getMessage());
     }
 }
 
@@ -71,6 +98,7 @@ if (
     $password = antiscript($_POST['password']);
     $sql = "SELECT * FROM docentes WHERE correo = '$correo'";
     $complet = $link->query($sql);
+
     if (mysqli_num_rows($complet) == 0) {
         if ($tipo == "1") {
             $insert1 = "INSERT INTO usuarios(usuario, contrasena, tipo_us) 
@@ -84,7 +112,7 @@ if (
                     header('Location: ../main/rd-main.php?mensaje=Se ha registrado correctamente');
                     exit();
                 } else {
-                    header('Location: ../main/rd-main.php?mensaje= Registro incorrecto');
+                    header('Location: ../main/rd-main.php?mensaje= REGISTRO INCORRECTO');
                     exit();
                 }
             }
@@ -97,7 +125,7 @@ if (
                 ORDER BY id_User DESC
                 LIMIT 1 ),'$nombre','$apellidoP','$apellidoM','$correo','$carrera','$num_celular')";
                 if ($link->query($insert2)) {
-                    header('Location: ../main/rd-main.php?mensaje=Se ha registrado correctamente');
+                    header('Location: ../main/rd-main.php?mensaje=SE HA REGISTRADO CORRECTAMENTE');
                     exit();
                 }
             }
@@ -108,19 +136,19 @@ if (
             if ($link->query($update)) {
                 $_SESSION['editar'] ='';
                 $_SESSION['IdEditar'] ='';
-                header('Location: ../main/rd-main.php?mensaje=Se ha actualizado correctamente');
+                header('Location: ../main/rd-main.php?mensaje=SE HA ACTUALIZADO CORRECTAMENTE');
                 exit();
             } else {
-                header('Location: ../main/rd-main.php?mensaje=Error al actualizar el docente');
+                header('Location: ../main/rd-main.php?mensaje=ERROR AL ACTUALIZAR EL DOCENTE ');
                 exit();
             }
         }catch(Exception $e)
         {
-            echo "Error: " . $e->getMessage();
+            header('Location: ../main/rd-main.php?mensaje='.$e->getMessage()  );
         }
    
     } else {
-        header('Location: ../main/rd-main.php?mensaje=Este docente ya existe'.$_SESSION['editar']);
+        header('Location: ../main/rd-main.php?mensaje=ESTE DOCENTE YA EXISTE'.$_SESSION['editar']);
         exit();
     }
 } else {
