@@ -1,9 +1,10 @@
 <?php
-if (session_status() == PHP_SESSION_ACTIVE) {
-    if ($_SESSION['id_User']) {
-        include('../system/conexion.php');
-    }
+session_start();
+if (isset($_SESSION['tipo_us']) != "Admin" || isset($_SESSION['tipo_us']) != "Docente") {
+  header('Location: ../main/index.php');
 }
+if (isset($_SESSION['tipo_us']) && isset($_SESSION['id_User'])) {
+  include('../system/conexion.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,3 +51,6 @@ if (session_status() == PHP_SESSION_ACTIVE) {
 </body>
 
 </html> 
+<?php
+}
+?>
