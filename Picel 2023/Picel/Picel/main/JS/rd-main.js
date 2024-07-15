@@ -12,15 +12,31 @@ document.addEventListener('DOMContentLoaded', function () {
         eliminarDocente(idDocente);
     });
 });
-
+//--------------------------VISTA-----------------------------------------
 let idDocente;
 
 function modal(id, Nombre) {
     document.getElementById('Nombre-Modal').innerText = Nombre;
     idDocente = id;
 }
-
-
+//---------------------------FUNCIONALIDAD-----------------------------------------
+function load(id) {
+    if (id == 0) {
+        document.getElementById("registros").style = "display:block;visibility:visible;";
+        document.getElementById("registrar").style = "display:none;visibility:hidden;";
+    } else {
+        $('#nombre-c').val("");
+        $('#apellidoP-c').val("");
+        $('#apellidoM-c').val("");
+        $('#carrera-c').val("");
+        $('#correo-c').val("");
+        $('#telefono-c').val("");
+        $('#usuario-c').val("");
+        $('#password-c').val("");
+        document.getElementById("registrar").style = "display:block;visibility:visible;";
+        document.getElementById("registros").style = "display:none;visibility:hidden;";
+    }
+}
 function eliminarDocente(idRegistro) {
     // Eliminar el registro con ID "idRegistro" de la base de datos
     try {
@@ -36,8 +52,8 @@ function eliminarDocente(idRegistro) {
             }
         });
     } catch (e) {
-        //$('#RESPUESTA').html(respuesta.RESPUESTA);
-        alert("Error al eliminar el registro" + e);
+        window.location.href = "./rd-main.php?mensaje=Error al eliminar el registro" + e;
+        
     }
 }
 
@@ -61,13 +77,14 @@ function editarDocente(idRegistro) {
                 $('#correo-c').val(docente.correo);
                 $('#telefono-c').val(docente.num_celular);
                 $('#usuario-c').val(docente.usuario);
-                $('#password-c').val(docente.contrasena);
+                $('#password-c').val(docente.contrasena); 
+                
                 $('#btn-regis').text('Aceptar');
             }
         });
     } catch (e) {
-        //$('#RESPUESTA').html(respuesta.RESPUESTA);
-        alert("Error al editar el registro: " + e);
+        window.location.replace('../main/rd-main.php?mensaje=ERROR AL EDITAR EL DOCENTE:' + e);
+
     }
 }
 
@@ -80,12 +97,13 @@ function cancel() {
                 cancel: true
             },
             success: function (respuesta) {
+                location.href = 'rd-main.php';
             }
         });
     } catch (e) {
         alert("Error" + e);
     }
-    location.href = 'rd-main.php';
+    
 }
 //---------------------------------VALIDACIONES----------------------------
 // Validaciones del formulario
