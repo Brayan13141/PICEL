@@ -1,6 +1,7 @@
 <?php
     session_start();
-    if ($_SESSION['id_user']) {
+    if (isset($_SESSION['id_user'])) {
+      echo'JALO';
 ?>
 <!DOCTYPE html>
 <html lang="en">
