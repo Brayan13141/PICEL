@@ -1,16 +1,20 @@
 <?php
 session_start();
-if ($_SESSION['tipo_us'] != "Admin") {
+if (isset($_SESSION['tipo_us']) != "Admin") {
   header("Location: index.php");
 }
-if ($_SESSION['id_User']) {
+if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] =="Admin") ||
+(isset($_SESSION['id_User']) && $_SESSION['tipo_us'] =="Docente")) {
   include('../system/conexion.php');
+  $_SESSION['editar'] = '';
+  $_SESSION['IdEditar'] = '';
 ?>
   <!DOCTYPE html>
   <html lang="en">
 
+
   <head>
-    <title>PICEL ~ RD</title>
+    <title>ESTUDIANTES</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="../ico/logo.ico">
@@ -31,6 +35,7 @@ if ($_SESSION['id_User']) {
         <div class="col"><button type="button" onclick="load(0);" class="mx-auto d-flex justify-content-center btn btn-success">Ver Registros</button></div>
         <div class="col"><button type="button" onclick="load(1);" class="mx-auto d-flex justify-content-center btn btn-success">Registrar Estudiante</button></div>
       </div>
+
       <div class="row" style="display:none;visibility:hidden;" id="registros">
         <div class="col-12 pt-2 text-center">
           <h3>Estudiantes</h3>
@@ -40,14 +45,13 @@ if ($_SESSION['id_User']) {
           $query = "SELECT * FROM estudiantes";
           echo '<table class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
         <tr> 
-            <td><p>No. Control</p></td> 
-            <td><p>Nombre</p></td>
-            <td><p>Correo</p></td> 
-            <td><p>Carrera</p></td> 
-            <td><p>Semestre</p></td> 
-            <td><p>Teléfono</p></td>
-             <td><p>Opciones</p></td>
- 
+              <td><strong><p>No. Control</p></strong></td>
+              <td><strong><p>Nombre</p></strong></td>
+              <td><strong><p>Correo</p></strong></td>
+              <td><strong><p>Carrera</p></strong></td>
+              <td><strong><p>Semestre</p></strong></td>
+              <td><strong><p>Teléfono</p></strong></td>
+              <td><strong><p>Opciones</p></strong></td>
         </tr>';
 
           if ($result = $link->query($query)) {
@@ -69,7 +73,7 @@ if ($_SESSION['id_User']) {
                     <td>' . $cel . '</td> 
                        <td>
                         <button type="button" class="btn btn-sm btn-primary" onclick="editarAlumno(' . $id_E . ')">Editar</button>
-                        <button type="button" id="btnEliminar" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="modal(' . $id_E . '\'' . addslashes($name) . '\')">Eliminar</button>
+                        <button type="button" id="btnEliminar" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="modal(' . $id_E . ',' . '\'' . addslashes($name) . '\')">Eliminar</button>
                        </td> 
                 </tr>';
             }
@@ -80,6 +84,8 @@ if ($_SESSION['id_User']) {
           ?>
         </div>
       </div>
+
+
       <div class="row" style="display:none;visibility:hidden;" id="registrar">
         <div class="col text-center pt-2 pb-4">
           <h3>Registro de Estudiantes</h3>
@@ -118,7 +124,7 @@ if ($_SESSION['id_User']) {
                 </select>
               </div>
               <div class="mb-3 col-6">
-                <label for="correoi-c" class="form-label">Correo</label>
+                <label for="correo-c" class="form-label">Correo</label>
                 <input type="email" class="form-control" id="correo-c" name="correoinstituto" required>
               </div>
             </div>
@@ -142,47 +148,57 @@ if ($_SESSION['id_User']) {
                 <input type="password" class="form-control" id="password-c" name="password" required>
               </div>
             </div>
-            <div class="pt-2 d-flex justify-content-center">
-              <button type="submit" class="btn btn-picel">Registrar</button>
+            <div class="pt-2 d-flex justify-content-around">
+              <button id="btn-regis" type="submit" class="btn btn-picel">Registrar</button>
+              <button type="button" class="btn btn-picel-Cancel" onclick="cancel()">Cancelar</button>
             </div>
           </form>
         </div>
       </div>
-    </div>
 
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>
-              ¿Estás seguro de que deseas eliminar a
-              <strong>
-                <label id="Nombre-Modal">
-                </label>
-              </strong>
-              ?
-            </p>
-            <label>Esta acción no se puede deshacer.</label>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar</button>
+
+      <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" style="border: 1px solid black;">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header" style="background-color: #5fbc18; position: relative;">
+              <div style="position: absolute; left: 10px;">
+                <img src="../imgs/logorecortado.png" class="img-fluid" alt="PICEL" width="55">
+              </div>
+              <h5 class="modal-title w-100 text-center" id="deleteModalLabel">Confirmar Eliminación</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                ¿Estás seguro de que deseas eliminar a
+                <strong>
+                  <label id="Nombre-Modal">
+                  </label>
+                </strong>
+                ?
+              </p>
+              <label>Esta acción no se puede deshacer.</label>
+            </div>
+            <div class="modal-footer" style=" background-color: #5fbc18;">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border: 1px solid black;">Cancelar</button>
+              <button type="button" class="btn btn-danger" id="confirmDelete" style="border: 1px solid black;">Eliminar</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
     <?php
     if (isset($_GET['mensaje'])) {
     ?>
-      <div class="modal fade" id="ModalMensaje" tabindex="-3">
-        <div class="modal-dialog">
+      <div class="modal fade" id="ModalMensaje" style="border: 1px solid black;" tabindex="-3">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Mensaje</h5>
+            <div class="modal-header" style="background-color: #5fbc18; position: relative;">
+              <div style="position: absolute; left: 10px;">
+                <img src="../imgs/logorecortado.png" class="img-fluid" alt="PICEL" width="55">
+              </div>
+              <h5 class="modal-title w-100 text-center">MENSAJE</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <p id="LabelModal"><?php
@@ -193,15 +209,14 @@ if ($_SESSION['id_User']) {
                                   }
                                   ?></p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style=" background-color: #5fbc18;">
               <h6>Da clic fuera del mensaje para continuar</h6>
             </div>
           </div>
         </div>
       </div>
     <?php
-      echo '
-     <script>
+      echo '<script>
        // Esperamos a que el documento se haya cargado completamente
        document.addEventListener("DOMContentLoaded", function() {
          // Seleccionamos el modal
@@ -212,13 +227,8 @@ if ($_SESSION['id_User']) {
      </script>';
     }
     ?>
-
-
-
-    <?php
-    include('footer.php');
-    ?>
-
+    <?php include('footer.php'); ?>
+    </div>
   </body>
 
   </html>
