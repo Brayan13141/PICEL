@@ -1,6 +1,4 @@
-drop database picel;
-create database picel;
-use picel;
+use picel3;
 
 CREATE TABLE Usuarios (
   id_User int primary key auto_increment,
@@ -40,14 +38,14 @@ CREATE TABLE Evento (
   id_Docente int not null,
   periodo varchar(50) NOT NULL,
   nombre text NOT NULL,
-  descrip text ,
+  descripcion text ,
   constraint FK_Evento_Docente foreign key (id_Docente) references docentes(id_Docente)
 );
 
 CREATE TABLE Tarea (
   id_Tarea int primary key auto_increment,
   nombre text NOT NULL,
-  descrip text
+  descripcion text
 );
 
 CREATE TABLE Actividades_Asignadas (
