@@ -1,28 +1,5 @@
-<?php 
-/*
- * It handles various operations related to docentes (teachers) in the system.
- * 
- * Functions:
- * - antiscript($data): A helper function that sanitizes the input data by removing leading/trailing spaces, backslashes, and converting special characters to HTML entities.
- * 
- * Actions:
- * - Cancel: If the 'cancel' POST parameter is set to true, it clears the session variables 'editar' and 'IdEditar' and redirects to ../main/rd-main.php.
- * - Eliminar Registro: If the 'accion' and 'id_registro' POST parameters are set and 'accion' is equal to "eliminar_registro", it deletes the docente record with the specified 'id_registro' from the 'docentes' table.
- * - Editar Registro: If the 'accion' and 'id_registro' POST parameters are set and 'accion' is equal to "editar_registro", it retrieves the docente record with the specified 'id_registro' from the 'docentes' table and stores it in the session variables 'editar' and 'idEditar'.
- * - Registrar Docente: If all the required POST parameters (nombre, apellidoP, apellidoM, carrera, correo, telefono, usuario, tipo, password) are set and not empty, it inserts a new docente record into the 'docentes' table along with the corresponding user record in the 'usuarios' table.
- * - Actualizar Docente: If the session variables 'editar' and 'idEditar' are set, it updates the docente record with the specified 'idEditar' in the 'docentes' table.
- * 
- * Redirects:
- * - If an error occurs during the database operations, it redirects to ../main/rd-main.php with an appropriate error message.
- * - If the registration or update is successful, it redirects to ../main/rd-main.php with a success message.
- * - If there are empty fields in the registration form, it redirects to ../main/rd-main.php with a message indicating that fields should not be left empty.
- * - If a docente with the same correo already exists and it's not an edit operation, it redirects to ../main/rd-main.php with a message indicating that the docente already exists.
- * 
- * Note: This code assumes the existence of a database connection object named $link, which is used to perform database operations.
- */
-?>
-
-<?php 
+ 
+<?php
 include("../system/conexion.php");
 session_start();
 
@@ -33,10 +10,9 @@ function antiscript($data)
     $data = htmlspecialchars($data);
     return $data;
 }
-if(isset($_POST['cancel']) && $_POST['cancel'] = true)
-{
-    $_SESSION['editar'] ='';
-    $_SESSION['IdEditar'] ='';
+if (isset($_POST['cancel']) && $_POST['cancel'] = true) {
+    $_SESSION['editar'] = '';
+    $_SESSION['IdEditar'] = '';
     header('Location: ../main/rd-main.php');
     exit();
 }
@@ -53,7 +29,6 @@ if (
                 echo json_encode(array("success" => true));
             } else {
                 header('Location: ../main/rd-main.php?mensaje=ERROR AL BORRAR EL DOCENTE');
-                
             }
         } else {
             $id_registro = antiscript($_POST['id_registro']);
@@ -67,12 +42,11 @@ if (
                 echo json_encode(array("success" => true, "DOCENTE" => $docente));
             } else {
                 header('Location: ../main/rd-main.php?mensaje=ERROR AL ACTUALIZAR');
-                
             }
         }
     } catch (Exception $e) {
 
-        header('Location: ../main/rd-main.php?mensaje='.$e->getMessage());
+        header('Location: ../main/rd-main.php?mensaje=' . $e->getMessage());
     }
 }
 
@@ -96,10 +70,13 @@ if (
     $usuario = antiscript($_POST['usuario']);
     $tipo = antiscript($_POST['tipo']);
     $password = antiscript($_POST['password']);
-    $sql = "SELECT * FROM docentes WHERE correo = '$correo'";
-    $complet = $link->query($sql);
+    $sql = "SELECT id_User FROM docentes WHERE correo = '$correo'";
+    $result = $link->query($sql);
+    $row = $result->fetch_assoc();
+    $id_User = $row['id_User'];
 
-    if (mysqli_num_rows($complet) == 0) {
+
+    if (mysqli_num_rows($result) == 0 && is_null(isset($_SESSION['editar'])) && is_null(isset($_SESSION['idEditar']))) {
         if ($tipo == "1") {
             $insert1 = "INSERT INTO usuarios(usuario, contrasena, tipo_us) 
             VALUES ('$usuario','$password','Docente')";
@@ -109,7 +86,7 @@ if (
                 ORDER BY id_User DESC LIMIT 1 ),
                 '$nombre','$apellidoP','$apellidoM','$correo','$carrera','$num_celular')";
                 if ($link->query($insert2)) {
-                    header('Location: ../main/rd-main.php?mensaje=Se ha registrado correctamente');
+                    header('Location: ../main/rd-main.php?mensaje=SE HA REGISTRADO CORRECTAMENTE');
                     exit();
                 } else {
                     header('Location: ../main/rd-main.php?mensaje= REGISTRO INCORRECTO');
@@ -130,37 +107,44 @@ if (
                 }
             }
         }
-    } else if (isset($_SESSION['editar']) &&  $_SESSION['editar'] = true && isset( $_SESSION['idEditar'])) {
-        try{
-            $update = "UPDATE docentes SET nombre = '$nombre', apellidoP = '$apellidoP', apellidoM = '$apellidoM', carrera = '$carrera', correo = '$correo', num_celular = '$num_celular' WHERE id_Docente = " . $_SESSION['idEditar'];
+    } else if (isset($_SESSION['editar']) &&  $_SESSION['editar'] = true && isset($_SESSION['idEditar'])) {
+        try {
+            $update = "UPDATE docentes SET correo ='$correo', nombre = '$nombre', apellidoP = '$apellidoP', apellidoM = '$apellidoM', carrera = '$carrera',num_celular = '$num_celular' WHERE id_Docente = " . $_SESSION['idEditar'];
+
+            $updateUser = "UPDATE usuarios SET usuario = '$usuario', contrasena = '$password' WHERE id_User = " . $id_User;
+
             if ($link->query($update)) {
-                $_SESSION['editar'] ='';
-                $_SESSION['IdEditar'] ='';
-                header('Location: ../main/rd-main.php?mensaje=SE HA ACTUALIZADO CORRECTAMENTE');
-                exit();
+                if ($link->query($updateUser)) {
+                    $_SESSION['editar'] = '';
+                    $_SESSION['IdEditar'] = '';
+                    header('Location: ../main/rd-main.php?mensaje=SE HA ACTUALIZADO CORRECTAMENTE');
+                    exit();
+                } else {
+                    header('Location: ../main/rd-main.php?mensaje=ERROR AL ACTUALIZAR EL DOCENTE');
+                    exit();
+                }
             } else {
                 header('Location: ../main/rd-main.php?mensaje=ERROR AL ACTUALIZAR EL DOCENTE ');
                 exit();
             }
-        }catch(Exception $e)
-        {
-            header('Location: ../main/rd-main.php?mensaje='.$e->getMessage()  );
+        } catch (Exception $e) {
+            header('Location: ../main/rd-main.php?mensaje=FALLO: ' . $e->getMessage());
         }
-   
     } else {
-        header('Location: ../main/rd-main.php?mensaje=ESTE DOCENTE YA EXISTE'.$_SESSION['editar']);
+        header('Location: ../main/rd-main.php?mensaje=ESTE DOCENTE YA EXISTE');
         exit();
     }
 } else {
-    //LOS MENSAJES SE GUARDAN EN LA VARIABLE DE SESION, SE RECARGA LA PAGINA. SI HAY MENSAJE SE MUESTRA
+    //SE RECARGA LA PAGINA. SI HAY MENSAJE SE MUESTRA
     //VALIDACION PARA QUE NO INTERVENGA CON LA FUNCIONALIDAD DE EDITAR Y ELIMINAR
     if (
         isset($_POST['accion'])  && isset($_POST['id_registro']) &&
         (isset($_POST['accion']) == "eliminar_registro" || isset($_POST['accion']) == "editar_registro")
+        
     ) {
         //NO SE REALIZA NADA
     } else {
-        header('Location: ../main/rd-main.php?mensaje=No dejes campos vacíos');
+        header('Location: ../main/rd-main.php?mensaje=NO DEJES CAMPOS VACIOS');
         exit();
     }
 }
