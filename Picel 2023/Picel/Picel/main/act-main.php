@@ -1,7 +1,8 @@
 <?php
 session_start();
-if ($_SESSION['id_User']) {
+if (isset($_SESSION['id_User'])) {
   include('../system/conexion.php');
+  include('../main/JS/act-main.php');
 ?>
   <!DOCTYPE html>
   <html lang="en">
@@ -15,6 +16,7 @@ if ($_SESSION['id_User']) {
     <link href="../css/estilo.css?v=<?php echo time(); ?>" rel="stylesheet">
     <script src="../js/jquery-3.6.0.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
+ 
   </head>
 
   <body>
@@ -41,11 +43,11 @@ if ($_SESSION['id_User']) {
           $query = "SELECT DISTINCT id_Evento FROM actividades_asignadas";
           echo '<table id="tabReg" class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
               <tr> 
-                  <td><p>Evento</p></td> 
-                  <td><p>No. Estudiantes</p></td> 
-                  <td><p>Docente</p></td> 
-                  <td><p>Estatus</p></td> 
-                  <td><p>Detalles</p></td>  
+                  <td><strong><p>Evento</p></strong></td> 
+                  <td><strong><p>No. Estudiantes</p></strong></td> 
+                  <td><strong><p>Docente</p></strong></td> 
+                  <td><strong><p>Estatus</p></strong></td> 
+                  <td><strong><p>Detalles</p></strong></td>  
               </tr>';
 
           if ($result = $link->query($query)) {
@@ -99,81 +101,43 @@ if ($_SESSION['id_User']) {
               </div>
               <div class="mb-3 col-6">
                 <label for="canEstudiantes-c" class="form-label">Cantidad de estudiantes</label>
-                <select id="noAlumnos" name="canEstudiantes" class="form-control">
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-              </div>
-            </div>
-            <!--Alumno 1-->
-            <div class="row" id="campoAlumno1">
-              <div class="mb-3 col-6">
-                <label for="estudiante-c" class="form-label">Estudiante</label>
                 <?php
-                $query2 = "SELECT * FROM estudiantes";
-                echo '<select name="alumno1" id="cmbAlumno1" class="form-control">';
+                $query2 = "SELECT count(*) FROM Estudiantes";
+                $query3 = "SELECT * FROM Estudiantes";
+
+                $opciones = '';
+
                 if ($result = $link->query($query2)) {
-                  while ($row = $result->fetch_assoc()) {
-                    $name = $row["nombre"];
-                    $id = $row["id_Estudiante"];
-                    echo '<option value="' . $id . '">' . $name . '</option>';
+                  $row = $result->fetch_assoc();
+                  $count = $row['count(*)'];
+                  echo '<select name="canEstudiantes" id="noAlumnos" class="form-control">';
+                  for ($i = 1; $i <= $count; $i++) {
+                    echo '<option value="' . $i . '">' . $i . '</option>';
+                  }
+                  echo '</select>';
+
+                  if ($result2 = $link->query($query3)) {
+                    while ($row2 = $result2->fetch_assoc()) {
+                      $name = $row2["nombre"];
+                      $apellido = $row2["apellidoP"];
+                      $opciones .= '<option value="'  . $name .' '. $apellido . '">' . $name .' '. $apellido . '</option>';
+                    }
+                    $result2->free(); 
+                    $_SESSION['opciones']=$opciones;
                   }
                   $result->free();
                 }
-                echo ' </select>';
                 ?>
-              </div>
-              <div class="mb-3 col-6">
-                <label for="nombre-c" class="form-label">Tarea</label>
-                <input type="text" id="txtTarea1" class="form-control" name="tarea1">
               </div>
             </div>
-            <!--Alumno 2-->
-            <div class="row" id="campoAlumno2" style="display:none;visibility:hidden;">
-              <div class="mb-3 col-6">
-                <label for="estudiante-c" class="form-label">Estudiante</label>
-                <?php
-                $query2 = "SELECT * FROM estudiantes";
-                echo '<select name="alumno2" id="cmbAlumno2" class="form-control">';
-                if ($result = $link->query($query2)) {
-                  while ($row = $result->fetch_assoc()) {
-                    $name = $row["nombre"];
-                    $id = $row["id_Estudiante"];
-                    echo '<option value="' . $id . '">' . $name . '</option>';
-                  }
-                  $result->free();
-                }
-                echo ' </select>';
-                ?>
+
+            <!--ALUMNOS-->
+            <div class="contenedor">
+
+              <div id="contenedorAlumnos">
+
               </div>
-              <div class="mb-3 col-6">
-                <label for="nombre-c" class="form-label">Tarea</label>
-                <input type="text" id="txtTarea2" class="form-control" name="tarea2">
-              </div>
-            </div>
-            <!--Alumno 3-->
-            <div class="row" id="campoAlumno3" style="display:none;visibility:hidden;">
-              <div class="mb-3 col-6">
-                <label for="estudiante-c" class="form-label">Estudiante</label>
-                <?php
-                $query2 = "SELECT * FROM estudiantes";
-                echo '<select name="alumno3" id="cmbAlumno3" class="form-control">';
-                if ($result = $link->query($query2)) {
-                  while ($row = $result->fetch_assoc()) {
-                    $name = $row["nombre"];
-                    $id = $row["id_Estudiante"];
-                    echo '<option value="' . $id . '">' . $name . '</option>';
-                  }
-                  $result->free();
-                }
-                echo ' </select>';
-                ?>
-              </div>
-              <div class="mb-3 col-6">
-                <label for="nombre-c" class="form-label">Tarea</label>
-                <input type="text" id="txtTarea3" class="form-control" name="tarea3">
-              </div>
+
             </div>
             <div class="row">
               <div class="mb-3 col-6">
@@ -230,61 +194,14 @@ if ($_SESSION['id_User']) {
         // Mostramos el modal
         modal.show();
         });
-    </script>';
+      </script>';
     }
     ?>
 
     <?php
     include('footer.php');
     ?>
-    <script>
-      function load(id) {
-        if (id == 0) {
-          document.getElementById("registros").style = "display:block;visibility:visible;";
-          document.getElementById("definir").style = "display:none;visibility:hidden;";
-        } else {
-          document.getElementById("definir").style = "display:block;visibility:visible;";
-          document.getElementById("registros").style = "display:none;visibility:hidden;";
-        }
-      }
-      let limite = 1,
-        original = 1,
-        eliminar = 0;
-      document.getElementById("noAlumnos").addEventListener('change',
-        () => {
-          limite = document.getElementById("noAlumnos").value;
-          document.getElementById("txtTarea1").value = "";
-          document.getElementById("txtTarea2").value = "";
-          document.getElementById("txtTarea3").value = "";
-          if (limite == 3) {
-            original = 3;
-            eliminar = 3;
-            document.getElementById("campoAlumno2").style = "visibility=visible;";
-            document.getElementById("campoAlumno3").style = "visibility=visible;";
-          } else if (limite == 2) {
-            original = 2;
-            eliminar = 2;
-            document.getElementById("campoAlumno2").style = "visibility=visible;";
-            document.getElementById("campoAlumno3").style = "display:none;visibility=hidden;";
-          } else {
-            original = 1;
-            eliminar = 1;
-            document.getElementById("campoAlumno2").style = "display:none;visibility=hidden;";
-            document.getElementById("campoAlumno3").style = "display:none;visibility=hidden;";
-          }
-        });
-
-      //Obtener el botón que se pulsó
-      let tabla = document.getElementById("tabReg");
-      let botones = tabla.getElementsByTagName("button");
-      for (var i = 0; i < botones.length; i++) {
-        botones[i].addEventListener("click", function() {
-          var valueBoton = this.value;
-          //alert("Se hizo clic en el botón con value: " + valueBoton);
-          window.location.href = 'mact-main.php?act=' + encodeURIComponent(valueBoton);
-        });
-      }
-    </script>
+ 
   </body>
 
   </html>
