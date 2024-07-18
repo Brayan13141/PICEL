@@ -47,12 +47,7 @@ if (
             $_SESSION['apellidoP'] = $f['apellidoP'];
             $_SESSION['apellidoM'] = $f['apellidoM'];
             $_SESSION['tipo_us'] = $f['tipo_us'];
-            /*$sql2 = "UPDATE usuarios SET time_log='$time_regis' WHERE usuario='$username'";
-            $link->query($sql2);
-            $sql3 = "UPDATE usuarios SET ip_log='$ipend' WHERE usuario='$username'";
-            $link->query($sql3);
-            $sql3 = "UPDATE usuarios SET activo='1' WHERE usuario='$username'";
-            $link->query($sql3);*/
+             
             header("Location: ../main/");
         } else {
             $error3 = base64_encode("Datos incorrectos");

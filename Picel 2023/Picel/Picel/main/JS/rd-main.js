@@ -78,7 +78,6 @@ function editarDocente(idRegistro) {
                 $('#telefono-c').val(docente.num_celular);
                 $('#usuario-c').val(docente.usuario);
                 $('#password-c').val(docente.contrasena); 
-                
                 $('#btn-regis').text('Aceptar');
             }
         });

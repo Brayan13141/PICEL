@@ -1,5 +1,4 @@
-<?php
-include("../system/encryptPSA.php");
+<?php 
 include("../system/conexion.php");
 if(isset($_POST['Alumnoid']))
 {

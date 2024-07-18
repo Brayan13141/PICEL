@@ -48,7 +48,6 @@ function editarAlumno(idRegistro) {
       },
       success: function (respuesta) {
         var datos = JSON.parse(respuesta);
-        alert(datos);
         var estudiante = datos.ESTUDIANTE;
         load(1);
         $("#nc-c").val(estudiante.num_control);
