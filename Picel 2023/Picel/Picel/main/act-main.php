@@ -2,7 +2,6 @@
 session_start();
 if (isset($_SESSION['id_User'])) {
   include('../system/conexion.php');
-  include('../main/JS/act-main.php');
 ?>
   <!DOCTYPE html>
   <html lang="en">
@@ -16,7 +15,7 @@ if (isset($_SESSION['id_User'])) {
     <link href="../css/estilo.css?v=<?php echo time(); ?>" rel="stylesheet">
     <script src="../js/jquery-3.6.0.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
- 
+
   </head>
 
   <body>
@@ -81,13 +80,13 @@ if (isset($_SESSION['id_User'])) {
           <h3>Definición de Actividades</h3>
         </div>
         <div class="grid mx-auto col-md-8" style="--bs-columns: 2;">
-          <form method="POST" action="../system/sm-activity.php?caso=1">
+          <form method="POST" id="frm_act" action="../system/sm-activity.php?caso=1" novalidate>
             <div class="row">
               <div class="mb-3 col-6">
                 <label for="evento-c" class="form-label">Evento</label>
                 <?php
                 $query2 = "SELECT * FROM evento";
-                echo '<select name="evento" id="cmbEvento" class="form-control">';
+                echo '<select name="evento" id="cmbEvento" class="form-control" required>';
                 if ($result = $link->query($query2)) {
                   while ($row = $result->fetch_assoc()) {
                     $name = $row["nombre"];
@@ -104,13 +103,11 @@ if (isset($_SESSION['id_User'])) {
                 <?php
                 $query2 = "SELECT count(*) FROM Estudiantes";
                 $query3 = "SELECT * FROM Estudiantes";
-
                 $opciones = '';
-
                 if ($result = $link->query($query2)) {
                   $row = $result->fetch_assoc();
                   $count = $row['count(*)'];
-                  echo '<select name="canEstudiantes" id="noAlumnos" class="form-control">';
+                  echo '<select name="canEstudiantes" id="noAlumnos" class="form-control" required>';
                   for ($i = 1; $i <= $count; $i++) {
                     echo '<option value="' . $i . '">' . $i . '</option>';
                   }
@@ -120,10 +117,10 @@ if (isset($_SESSION['id_User'])) {
                     while ($row2 = $result2->fetch_assoc()) {
                       $name = $row2["nombre"];
                       $apellido = $row2["apellidoP"];
-                      $opciones .= '<option value="'  . $name .' '. $apellido . '">' . $name .' '. $apellido . '</option>';
+                      $opciones .= '<option value="'  . $name . ' ' . $apellido . '">' . $name . ' ' . $apellido . '</option>';
                     }
-                    $result2->free(); 
-                    $_SESSION['opciones']=$opciones;
+                    $result2->free();
+                    $_SESSION['opciones'] = $opciones;
                   }
                   $result->free();
                 }
@@ -133,20 +130,18 @@ if (isset($_SESSION['id_User'])) {
 
             <!--ALUMNOS-->
             <div class="contenedor">
-
               <div id="contenedorAlumnos">
 
               </div>
-
             </div>
             <div class="row">
               <div class="mb-3 col-6">
                 <label for="nombre-c" class="form-label">Fecha Inicio</label>
-                <input type="date" class="form-control" name="fechai" value="2023-01-15" min="2020-01-01" max="2030-12-31">
+                <input type="date" class="form-control" name="fechai" value="2023-01-15" min="2020-01-01" max="2030-12-31" required>
               </div>
               <div class="mb-3 col-6">
                 <label for="nombre-c" class="form-label">Fecha Término</label>
-                <input type="date" class="form-control" name="fechat" value="2023-02-28" min="2020-01-01" max="2030-12-31">
+                <input type="date" class="form-control" name="fechat" value="2023-02-28" min="2020-01-01" max="2030-12-31" required>
               </div>
             </div>
             <div class="pt-2 d-flex justify-content-center">
@@ -200,26 +195,22 @@ if (isset($_SESSION['id_User'])) {
 
     <?php
     include('footer.php');
+
+    include('../main/JS/act-main.php');
     ?>
- 
+    <script>
+
+    </script>
   </body>
 
   </html>
 <?php
 } else {
 ?>
-  <HTML>
-
-  <HEAD>
-    <TITLE>Picel</TITLE>
-
-  </HEAD>
-
-  <body BGCOLOR="black">
-    <script>
-      location.href = "../";
-    </script>
-  </body>
+  <script>
+    alert('No tienes autorización para ingresar a esta página');
+    window.location.href = "../index.php";
+  </script>
 <?php
 }
 ?>
