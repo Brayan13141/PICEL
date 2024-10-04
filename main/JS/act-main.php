@@ -3,7 +3,7 @@
     } else {
         session_start();
     }
-    if ((isset($_SESSION['id_User']))) {
+    if (isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin" || $_SESSION['tipo_us'] == "Docente") {
     ?>
      <script>
          let OpcionesGlobales;
