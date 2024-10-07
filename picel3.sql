@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 04-10-2024 a las 01:30:46
+-- Tiempo de generación: 07-10-2024 a las 01:42:04
 -- Versión del servidor: 8.3.0
 -- Versión de PHP: 8.2.18
 
@@ -30,30 +30,23 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `actividades_asignadas`;
 CREATE TABLE IF NOT EXISTS `actividades_asignadas` (
   `id_Actividades` int NOT NULL AUTO_INCREMENT,
-  `id_Estudiante` int NOT NULL,
   `id_Evento` int NOT NULL,
-  `id_Tarea` int NOT NULL,
   `fecha_ini` varchar(30) NOT NULL,
   `id_Docente` int NOT NULL,
   `Nombre` varchar(100) NOT NULL,
   PRIMARY KEY (`id_Actividades`),
-  KEY `FK_Actividades_Estudiantes` (`id_Estudiante`),
   KEY `FK_Actividades_Evento` (`id_Evento`),
-  KEY `FK_Actividades_Tarea` (`id_Tarea`),
   KEY `fk_estudiante` (`id_Docente`)
-) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `actividades_asignadas`
 --
 
-INSERT INTO `actividades_asignadas` (`id_Actividades`, `id_Estudiante`, `id_Evento`, `id_Tarea`, `fecha_ini`, `id_Docente`, `Nombre`) VALUES
-(1, 1, 1, 1, '2024-09-23 22:53:30', 5, 'NUEVA'),
-(2, 2, 3, 4, '2024-09-23 22:53:30', 3, 'NO SE'),
-(15, 2, 2, 21, '2023-01-15', 2, 'm jm¿'),
-(22, 1, 4, 29, '2023-01-15', 5, 'CREADA'),
-(21, 2, 4, 28, '2023-01-15', 5, 'CREADA'),
-(23, 3, 4, 30, '2023-01-15', 5, 'CREADA');
+INSERT INTO `actividades_asignadas` (`id_Actividades`, `id_Evento`, `fecha_ini`, `id_Docente`, `Nombre`) VALUES
+(64, 1, '2023-12-15', 2, 'm jm'),
+(63, 1, '2023-01-15', 5, 'N2'),
+(62, 1, '2023-12-15', 5, 'ACT FINAL');
 
 -- --------------------------------------------------------
 
@@ -81,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `docentes` (
 
 INSERT INTO `docentes` (`id_Docente`, `id_User`, `nombre`, `apellidoP`, `apellidoM`, `correo`, `carrera`, `num_celular`) VALUES
 (1, 4, 'Juan pablo', 'Villa', 'Villagomez', 'JuanViVi@Docentes.itsur.edu.mx', 'Ing Sistemas', '4174567898'),
-(2, 5, 'Dominic', 'Camargo', 'Ruiz', 'Comino@Docentes.itsur.edu.mx', 'Ing Sistemas', '4171124565'),
+(2, 2, 'Dominic', 'Camargo', 'Ruiz', 'Comino@Docentes.itsur.edu.mx', 'Ing Sistemas', '4171124565'),
 (3, 6, 'Socorro', 'García', 'Perez', 'SocorroGaPe@Docentes.itsur.edu.mx', 'Ing Sistemas', '4454578967'),
 (5, 8, 'BRAYAN', 'SANCHEZ', 'MONROY', 'S290@ALUMNOS.COM', 'ING SISTEMAS COMPUTACIONALES', '123451');
 
@@ -154,25 +147,25 @@ CREATE TABLE IF NOT EXISTS `tarea` (
   `id_Tarea` int NOT NULL AUTO_INCREMENT,
   `nombre` text NOT NULL,
   `descripcion` text,
-  PRIMARY KEY (`id_Tarea`)
-) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `id_Actividad` int NOT NULL,
+  `id_Estudiante` varchar(9) NOT NULL,
+  PRIMARY KEY (`id_Tarea`),
+  KEY `tarea_act_asig` (`id_Actividad`)
+) ENGINE=MyISAM AUTO_INCREMENT=96 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `tarea`
 --
 
-INSERT INTO `tarea` (`id_Tarea`, `nombre`, `descripcion`) VALUES
-(1, 'Reportes', 'Realizar un reporte sobre el evento, debe contener...'),
-(2, 'Fotos', 'Tomar fotos del evento y editarlos para que se ven bien nice'),
-(3, 'Comida', 'llevarle comida a los otros miembros de equipo'),
-(4, 'Organizar', 'Agendarle tarear y eventos a cada alumno'),
-(30, 'jnjnjn', NULL),
-(29, 'NUEVO', NULL),
-(28, 'mnjbvtybn', NULL),
-(27, ',imnuim,', NULL),
-(26, ',kmjnumk', NULL),
-(25, 'DEF', NULL),
-(21, 'MKINUB', NULL);
+INSERT INTO `tarea` (`id_Tarea`, `nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`) VALUES
+(90, 'ACT FINAL', 'ijm', 62, 's20120212'),
+(89, 'ACT FINAL', 'JHBNJ', 62, 's20120176'),
+(88, 'ACT FINAL', 'mnjhbvghbnj', 62, 's20120224'),
+(91, 'N2', 'mnjhbvghbnj', 63, 's20120224'),
+(92, 'N2', 'NUEVO', 63, 's20120176'),
+(93, 'm jm', 'mnjhbvghbnj', 64, 's20120224'),
+(94, 'm jm', 'NUEVO', 64, 's20120176'),
+(95, 'm jm', 'jnjnjn', 64, 's20120212');
 
 -- --------------------------------------------------------
 
