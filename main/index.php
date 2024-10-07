@@ -46,14 +46,7 @@ if ($_SESSION['id_User']) {
                     </div>
                 </div>
             </div>
-            <div class="col">
-                <div class="card card-main mx-auto" onclick="location.href='re-main.php';" style="width: 18rem;">
-                    <i class="fa fa-users" aria-hidden="true" style="font-size: 218px;text-align: center;"></i>
-                    <div class="card-body">
-                        <h4 class="text-center"><strong>Estudiantes</strong></h4>
-                    </div>
-                </div>
-            </div>
+
             <div class="col">
                 <div class="card card-main mx-auto" onclick="location.href='evento-main.php';" style="width: 18rem;">
                     <i class="fa fa-calendar" aria-hidden="true" style="font-size: 218px;text-align: center;"></i>
