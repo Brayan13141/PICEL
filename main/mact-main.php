@@ -29,58 +29,84 @@ if ($_SESSION['id_User']) {
 
             <div class="row" id="monitoreo">
                 <?php
-                $id_Evento = $_GET['id_E'];
-                $id_Docente = $_GET['id_D'];
-                $id_Act = $_GET['id_A'];
 
-                $query2 = "SELECT id_Docente FROM docentes WHERE id_User = '" . $_SESSION['id_User'] . "'";
-                if ($result = $link->query($query2)) {
-                    while ($row = $result->fetch_assoc()) {
-                        $id_Docente = $row["id_Docente"];
+                if (isset($_GET['id_E']) && !empty($_GET['id_E']) && isset($_GET['id_D']) && !empty($_GET['id_D']) && isset($_GET['id_A']) && !empty($_GET['id_A'])) {
+                    $id_Evento = $_GET['id_E'];
+                    $id_Docente = $_GET['id_D'];
+                    $id_Act = $_GET['id_A'];
+                    if ($_SESSION['tipo_us'] == "Admin") {
+
+                        $query2 = "SELECT id_Docente FROM docentes WHERE id_User = '" .  $id_Docente  . "'";
+                        if ($result = $link->query($query2)) {
+                            while ($row = $result->fetch_assoc()) {
+                                $id_Docente = $row["id_Docente"];
+                            }
+                            $result->free();
+                        }
+
+                        $query3 = "SELECT DISTINCT  concat(e.nombre,' ',e.apellidoP,' ',e.apellidoM) AS nombre_completo , t.nombre,t.descripcion 
+                        FROM tarea t, actividades_asignadas a, estudiantes e, docentes d
+                        WHERE t.id_Estudiante = e.num_control
+                        AND  a.id_Evento = '$id_Evento' AND '$id_Docente' = a.id_Docente 
+                        AND a.id_Actividades = '$id_Act'
+                        AND a.id_Actividades = t.id_Actividad";
+                    } else if ($_SESSION['tipo_us'] == "Docente") {
+
+                        $query2 = "SELECT id_Docente FROM docentes WHERE id_User = '" . $_SESSION['id_User'] . "'";
+                        if ($result = $link->query($query2)) {
+                            while ($row = $result->fetch_assoc()) {
+                                $id_Docente = $row["id_Docente"];
+                            }
+                            $result->free();
+                        }
+
+                        $query3 = "SELECT DISTINCT concat(e.nombre,' ',e.apellidoP,' ',e.apellidoM) AS nombre_completo , t.nombre,t.descripcion 
+                        FROM tarea t, actividades_asignadas a, estudiantes e, docentes d
+                        WHERE t.id_Estudiante = e.num_control
+                        AND  a.id_Evento = '$id_Evento' AND '$id_Docente' = a.id_Docente 
+                        AND a.id_Actividades = '$id_Act'
+                        AND a.id_Actividades = t.id_Actividad";
                     }
-                    $result->free();
-                }
-                $query3 = "SELECT DISTINCT t.nombre, concat(e.nombre,' ',e.apellidoP,' ',e.apellidoM) 
-                    AS nombre_completo FROM tarea t, actividades_asignadas a, estudiantes e, docentes d
-                    WHERE t.id_Estudiante = e.num_control
-                    AND  a.id_Evento = '$id_Evento' AND '$id_Docente' = a.id_Docente 
-                    AND a.id_Actividades = '$id_Act'
-                    AND a.id_Actividades = t.id_Actividad";
 
 
-                echo '<div class="col-12 pt-2 text-center">
-                <h3>Monitorear Actividad</h3>
-            </div>';
-                echo '
-            <table class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
-                <tr> 
-                    <td><p>Alumno</p></td> 
-                    <td><p>Tarea</p></td> 
-                    <td><p>Estado</p></td> 
-                    <td><p>Evidencia</p></td> 
-                    <td><p>Anotaciones</p></td>  
-                </tr>';
-                if ($result = $link->query($query3)) {
-                    while ($row = $result->fetch_assoc()) {
-                        $Nombreact = $row["nombre"];
-                        $name_completo = $row["nombre_completo"];
 
-
-                        echo '<tr> 
-                              <td>' . $Nombreact . '</td> 
-                              <td>' . $name_completo . '</td> 
-                              <td>0%</td> 
-                              <td>Nada</td> 
-                              <td>Incompleta</td>
-                          </tr>';
-                    }
-                    echo "</table>";
-                    $result->free();
-                } else {
                     echo '<div class="col-12 pt-2 text-center">
-                    <h3>No hay registros</h3>';
-                }
+                        <h3>Monitorear Actividad</h3>
+                    </div>';
+                    echo '
+                    <table class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
+                        <tr> 
+                         <td><strong><p>Alumno</p></strong></td> 
+                         <td><strong><p>Tarea</p></strong></td> 
+                         <td><strong><p>Descripcion</p></strong></td> 
+                         <td><strong><p>Estado</p></strong></td> 
+                         <td><strong><p>Evidencia</p></strong></td> 
+                         <td><strong><p>Anotaciones</p></strong></td> 
 
+                          
+                        </tr>';
+                    if ($result = $link->query($query3)) {
+                        while ($row = $result->fetch_assoc()) {
+                            $Nombreact = $row["nombre"];
+                            $name_completo = $row["nombre_completo"];
+                            $descripcion = $row["descripcion"];
+
+                            echo '<tr> 
+                                    <td>' . $name_completo . '</td> 
+                                    <td>' . $Nombreact . '</td> 
+                                    <td>' . $descripcion . '</td> 
+                                    <td>0%</td> 
+                                    <td>Nada</td> 
+                                    <td>Incompleta</td>
+                                </tr>';
+                        }
+                        echo "</table>";
+                        $result->free();
+                    } else {
+                        echo '<div class="col-12 pt-2 text-center">
+                            <h3>No hay registros</h3>';
+                    }
+                }
                 ?>
             </div>
         </div>
