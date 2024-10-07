@@ -29,41 +29,59 @@ if (isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin" || $_SESSION[
     }
     if ($pasable == $_POST['canEstudiantes']) {
       //ciclo que insertará la actividad n veces en relación a la cantidad de estudiantes
-      for ($can = 1; $can <= $_POST['canEstudiantes']; $can++) {
-        $campoT = 'tarea' . $can;
-        $campoA = 'alumno' . $can;
-        //obtener valores
-        $tarea = antiscript($_POST[$campoT]);
-        $id_Evento = antiscript($_POST['evento']);
-        $ALUMNO = antiscript($_POST[$campoA]);
-        $fechai = antiscript($_POST['fechai']);
-        $NombreA = antiscript($_POST['NombreA']);
+      $fechai = antiscript($_POST['fechai']);
+      $NombreA = antiscript($_POST['NombreA']);
+      $id_Evento = antiscript($_POST['evento']);
 
-        //intertar tarea
-        $insert1 = "INSERT INTO tarea(nombre) VALUES('$tarea')";
-        if ($link->query($insert1)) {
-          //insertar actividad
+      //CREAMOS EL INSERT DE LAS ACTIVIDAES
+      $insert2 = "INSERT INTO actividades_asignadas(id_evento, fecha_ini, Nombre, id_Docente)
+      VALUES( 
+          '$id_Evento',
+          '$fechai',
+          '$NombreA',
+          (SELECT id_Docente FROM docentes WHERE id_User = " . $_SESSION['id_User'] . ")
+      )";
+      //OBTENEMOS LA ULTIMA ACTIVIDAD INSERTADA
 
-          $insert2 = "INSERT INTO actividades_asignadas(id_estudiante, id_evento, id_Tarea, fecha_ini, Nombre, id_Docente)
-            VALUES(
-                (SELECT id_Estudiante FROM estudiantes WHERE CONCAT(nombre, ' ', apellidoP) = '$ALUMNO'),
-                '$id_Evento',
-                last_insert_id(),
-                '$fechai',
-                '$NombreA',
-                (SELECT id_Docente FROM docentes WHERE id_User = " . $_SESSION['id_User'] . ")
-            )";
+      //insertar actividad
+      if ($link->query($insert2)) {
 
-          if ($link->query($insert2)) {
-            $termino++;
+        $sele = "SELECT LAST_INSERT_ID() as id FROM actividades_asignadas";
+        if ($result = $link->query($sele)) {
+          $row = $result->fetch_assoc();
+          $id_Act = $row["id"];
+
+          for ($can = 1; $can <= $_POST['canEstudiantes']; $can++) {
+            $campoT = 'tarea' . $can;
+            $campoA = 'alumno' . $can;
+            //OBTENEMOS LOS VALORES DE LOS ALUMNOS Y DE LAS TAREAS
+            $tarea = antiscript($_POST[$campoT]);
+            $ALUMNO = antiscript($_POST[$campoA]);
+
+            try {
+
+              $insert1 = "INSERT INTO tarea(nombre,descripcion,id_Actividad,id_Estudiante) VALUES('$NombreA','$tarea','$id_Act','$ALUMNO')";
+
+              if ($link->query($insert1)) {
+                $termino++;
+              } else {
+                echo "<script>location.href='../main/act-main.php?mensaje=ERROR AL REGISTRAR ALUMNO'</script>";
+              }
+              $result->free();
+            } catch (\Throwable $th) {
+              echo "<script>location.href='../main/act-main.php?mensaje=ERROR AL REGISTRAR'" . $th . "</script>";
+            }
           }
         }
+      } else {
+        echo "<script>location.href='../main/act-main.php?mensaje=ERROR AL REGISTRAR LA ACTIVIDAD'</script>";
       }
+
       //ver si todo se insertó
       if ($termino == $_POST['canEstudiantes']) {
         echo "<script>location.href='../main/act-main.php?mensaje=REGISTRO EXITOSO'</script>";
       } else {
-        echo "<script>location.href='../main/act-main.php?mensaje=ERROR AL REGISTRAR'</script>";
+        echo "<script>location.href='../main/act-main.php?mensaje=NO SE COMPLETARON LOS REGISTROS'</script>";
       }
     } else {
       echo "<script>location.href='../main/act-main.php?mensaje=COMPLETA TODOS LOS CAMPOS'</script>";
