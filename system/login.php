@@ -23,7 +23,7 @@ if (
 
     $sql2 = "SELECT * FROM estudiantes e, usuarios u WHERE e.id_user = u.id_user and u.usuario= UNHEX('$usenc')";
     $complet2 = $link->query($sql2);
-    
+
     if ($f = $complet->fetch_array()) {
         if ($pass == $f['contrasena']) {
             session_start();
@@ -47,7 +47,8 @@ if (
             $_SESSION['apellidoP'] = $f['apellidoP'];
             $_SESSION['apellidoM'] = $f['apellidoM'];
             $_SESSION['tipo_us'] = $f['tipo_us'];
-             
+            $_SESSION['num_control'] = $f['num_control'];
+
             header("Location: ../main/");
         } else {
             $error3 = base64_encode("Datos incorrectos");

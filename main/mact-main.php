@@ -3,32 +3,32 @@ session_start();
 if ($_SESSION['id_User']) {
     include('../system/conexion.php');
 ?>
-    <!DOCTYPE html>
-    <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
-    <head>
-        <title>PICEL ~ RD</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" href="../ico/logo.ico">
-        <link href="../css/bootstrap.min.css" rel="stylesheet">
-        <link href="../css/estilo.css?v=<?php echo time(); ?>" rel="stylesheet">
-        <script src="../js/jquery-3.6.0.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
-    </head>
+<head>
+    <title>PICEL ~ RD</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="../ico/logo.ico">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/estilo.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+</head>
 
-    <body>
-        <?php
+<body>
+    <?php
         require('menu.php');
         ?>
-        <div class="container margen">
-            <div class="row mt-3">
-                <div class="col"><button type="button" onclick="regresar();"
-                        class="mx-auto btn btn-success">Regresar</button></div>
-            </div>
+    <div class="container margen">
+        <div class="row mt-3">
+            <div class="col"><button type="button" onclick="regresar();"
+                    class="mx-auto btn btn-success">Regresar</button></div>
+        </div>
 
-            <div class="row" id="monitoreo">
-                <?php
+        <div class="row" id="monitoreo">
+            <?php
 
                 if (isset($_GET['id_E']) && !empty($_GET['id_E']) && isset($_GET['id_D']) && !empty($_GET['id_D']) && isset($_GET['id_A']) && !empty($_GET['id_A'])) {
                     $id_Evento = $_GET['id_E'];
@@ -50,7 +50,8 @@ if ($_SESSION['id_User']) {
                         AND  a.id_Evento = '$id_Evento' AND '$id_Docente' = a.id_Docente 
                         AND a.id_Actividades = '$id_Act'
                         AND a.id_Actividades = t.id_Actividad";
-                    } else if ($_SESSION['tipo_us'] == "Docente") {
+                    } 
+                    if ($_SESSION['tipo_us'] == "Docente") {
 
                         $query2 = "SELECT id_Docente FROM docentes WHERE id_User = '" . $_SESSION['id_User'] . "'";
                         if ($result = $link->query($query2)) {
@@ -66,6 +67,7 @@ if ($_SESSION['id_User']) {
                         AND  a.id_Evento = '$id_Evento' AND '$id_Docente' = a.id_Docente 
                         AND a.id_Actividades = '$id_Act'
                         AND a.id_Actividades = t.id_Actividad";
+                        
                     }
 
 
@@ -108,34 +110,34 @@ if ($_SESSION['id_User']) {
                     }
                 }
                 ?>
-            </div>
         </div>
+    </div>
 
-        <?php
+    <?php
         include('footer.php');
         ?>
-    </body>
-    <script>
-        function regresar() {
-            window.location.href = 'act-main.php';
-        }
-    </script>
+</body>
+<script>
+function regresar() {
+    window.location.href = 'act-main.php';
+}
+</script>
 
-    </html>
+</html>
 <?php
 } else {
 ?>
-    <HTML>
+<HTML>
 
-    <HEAD>
-        <TITLE>Picel</TITLE>
-    </HEAD>
+<HEAD>
+    <TITLE>Picel</TITLE>
+</HEAD>
 
-    <body BGCOLOR="black">
-        <script>
-            location.href = "../";
-        </script>
-    </body>
+<body BGCOLOR="black">
+    <script>
+    location.href = "../";
+    </script>
+</body>
 <?php
 }
 ?>

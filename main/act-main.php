@@ -61,8 +61,11 @@
                 </tr>';
 
                         if ($_SESSION['tipo_us'] == "Admin") {
+
                             if ($result1 = $link->query($query)) {
+
                                 while ($row = $result1->fetch_assoc()) {
+
                                     $id_Evento = $row["id_Evento"];
                                     $query_d0 = "SELECT DISTINCT 
                                         a.Nombre AS actividad, 
@@ -78,16 +81,18 @@
                                         JOIN 
                                             docentes d ON a.id_Docente = d.id_Docente
                                         LEFT JOIN 
-                                            tarea t ON a.id_Actividades = t.id_Actividad -- unir con las tareas para obtener estudiantes
+                                            tarea t ON a.id_Actividades = t.id_Actividad 
                                         LEFT JOIN 
-                                            estudiantes e ON t.id_Estudiante = e.id_Estudiante -- obtener información de los estudiantes
+                                            estudiantes e ON t.id_Estudiante = e.id_Estudiante 
+                                        WHERE 
+                                            a.id_Evento = $id_Evento
                                         GROUP BY 
                                             a.Nombre, ev.nombre, d.nombre, d.apellidoP, a.id_Actividades, d.id_Docente;";
 
-                                    $result_d0 = $link->query($query_d0);
-                                    if ($result_d0->num_rows > 0) {
-                                        // Recuperar cada fila de resultados y usar var_dump directamente
+
+                                    if ($result_d0 = $link->query($query_d0)) {
                                         while ($row_d0 = $result_d0->fetch_array(MYSQLI_NUM)) {
+
                                             echo '<tr> 
                                             <td>' . (!empty($row_d0[0]) ? $row_d0[0] : '') . '</td> 
                                             <td>' . (!empty($row_d0[1]) ? $row_d0[1] : '') . '</td> 
@@ -101,15 +106,16 @@
                                             </td>
                                             </tr>';
                                         }
-                                    } else {
-                                        echo "0 resultados";
                                     }
                                 }
                                 echo "</table>";
                             }
                         } else if ($_SESSION['tipo_us'] == "Docente") {
+
                             if ($result1 = $link->query($query)) {
+
                                 while ($row = $result1->fetch_assoc()) {
+
                                     $id_Evento = $row["id_Evento"];
                                     $query_d0 = "SELECT DISTINCT 
                                         a.Nombre AS actividad, 
@@ -133,8 +139,9 @@
                                         GROUP BY 
                                             a.Nombre, ev.nombre, d.nombre, d.apellidoP, a.id_Actividades, d.id_Docente;";
                                     $result_d0 = $link->query($query_d0);
+
                                     if ($result_d0->num_rows > 0) {
-                                        // Recuperar cada fila de resultados y usar var_dump directamente
+
                                         while ($row_d0 = $result_d0->fetch_array(MYSQLI_NUM)) {
                                             echo '<tr> 
                                             <td>' . (!empty($row_d0[0]) ? $row_d0[0] : '') . '</td> 

@@ -60,7 +60,7 @@ if (isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin" || $_SESSION[
 
             try {
 
-              $insert1 = "INSERT INTO tarea(nombre,descripcion,id_Actividad,id_Estudiante) VALUES('$NombreA','$tarea','$id_Act','$ALUMNO')";
+              $insert1 = "INSERT INTO tarea(nombre,descripcion,id_Actividad,id_Estudiante,Estatus) VALUES('$NombreA','$tarea','$id_Act','$ALUMNO',false)";
 
               if ($link->query($insert1)) {
                 $termino++;
