@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 07-10-2024 a las 01:42:04
+-- Tiempo de generación: 09-10-2024 a las 06:16:44
 -- Versión del servidor: 8.3.0
 -- Versión de PHP: 8.2.18
 
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `actividades_asignadas` (
   PRIMARY KEY (`id_Actividades`),
   KEY `FK_Actividades_Evento` (`id_Evento`),
   KEY `fk_estudiante` (`id_Docente`)
-) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `actividades_asignadas`
@@ -46,7 +46,9 @@ CREATE TABLE IF NOT EXISTS `actividades_asignadas` (
 INSERT INTO `actividades_asignadas` (`id_Actividades`, `id_Evento`, `fecha_ini`, `id_Docente`, `Nombre`) VALUES
 (64, 1, '2023-12-15', 2, 'm jm'),
 (63, 1, '2023-01-15', 5, 'N2'),
-(62, 1, '2023-12-15', 5, 'ACT FINAL');
+(62, 1, '2023-12-15', 5, 'ACT FINAL'),
+(65, 2, '2023-01-15', 2, 'ACT ESTATUS'),
+(66, 3, '2023-01-15', 3, 'ESTADO');
 
 -- --------------------------------------------------------
 
@@ -65,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `docentes` (
   `carrera` varchar(35) NOT NULL,
   `num_celular` char(10) NOT NULL,
   PRIMARY KEY (`id_Docente`),
-  KEY `FK_Docentes_Usuario` (`id_User`)
+  KEY `FK_Docentes_Usuarios` (`id_User`)
 ) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -73,9 +75,9 @@ CREATE TABLE IF NOT EXISTS `docentes` (
 --
 
 INSERT INTO `docentes` (`id_Docente`, `id_User`, `nombre`, `apellidoP`, `apellidoM`, `correo`, `carrera`, `num_celular`) VALUES
-(1, 4, 'Juan pablo', 'Villa', 'Villagomez', 'JuanViVi@Docentes.itsur.edu.mx', 'Ing Sistemas', '4174567898'),
-(2, 2, 'Dominic', 'Camargo', 'Ruiz', 'Comino@Docentes.itsur.edu.mx', 'Ing Sistemas', '4171124565'),
-(3, 6, 'Socorro', 'García', 'Perez', 'SocorroGaPe@Docentes.itsur.edu.mx', 'Ing Sistemas', '4454578967'),
+(1, 4, 'Juan pablo', 'Villa', 'Villagomez', 'JuanViVi@Docentes.itsur.edu.mx', 'ING ELECTRONICA', '4174567898'),
+(2, 2, 'Dominic', 'Camargo', 'Ruiz', 'Comino@Docentes.itsur.edu.mx', 'ING ELECTRONICA', '4171124565'),
+(3, 3, 'Socorro', 'García', 'Perez', 'SocorroGaPe@Docentes.itsur.edu.mx', 'ING GESTION EMPRESARIAL', '4454578967'),
 (5, 8, 'BRAYAN', 'SANCHEZ', 'MONROY', 'S290@ALUMNOS.COM', 'ING SISTEMAS COMPUTACIONALES', '123451');
 
 -- --------------------------------------------------------
@@ -96,18 +98,20 @@ CREATE TABLE IF NOT EXISTS `estudiantes` (
   `carrera` varchar(25) NOT NULL,
   `semestre` int NOT NULL,
   `num_celular` char(10) NOT NULL,
+  `id_Docente` int NOT NULL,
   PRIMARY KEY (`id_Estudiante`),
-  KEY `FK_Estudiantes_Usuario` (`id_User`)
+  KEY `FK_Estudiantes_Usuario` (`id_User`),
+  KEY `FK_Estudiantes_Docentes` (`id_Docente`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `estudiantes`
 --
 
-INSERT INTO `estudiantes` (`id_Estudiante`, `id_User`, `num_control`, `nombre`, `apellidoP`, `apellidoM`, `correo`, `carrera`, `semestre`, `num_celular`) VALUES
-(1, 1, 's20120224', 'Jesse Santiago', 'Barrera', 'Zuñiga', 's20120224@alumnos.itsur.edu.mx', 'Ing Sistemas', 7, '4171128536'),
-(2, 2, 's20120176', 'Azucena', 'Camargo', 'Ruiz', 's20120176@alumnos.itsur.edu.mx', 'Ing Sistemas', 7, '4171027589'),
-(3, 3, 's20120212', 'Jose Martin', 'García', 'Martínez', 's20120212@alumnos.itsur.edu.mx', 'Ing Sistemas', 7, '4452163920');
+INSERT INTO `estudiantes` (`id_Estudiante`, `id_User`, `num_control`, `nombre`, `apellidoP`, `apellidoM`, `correo`, `carrera`, `semestre`, `num_celular`, `id_Docente`) VALUES
+(1, 1, 's20120224', 'Jesse Santiago', 'Barrera', 'Zuñiga', 's20120224@alumnos.itsur.edu.mx', 'ING SISTEMAS COMPUTACIONA', 7, '4171128536', 1),
+(2, 2, 's20120176', 'Azucena', 'Camargo', 'Ruiz', 's20120176@alumnos.itsur.edu.mx', 'ING AMBIENTAL', 7, '4171027589', 2),
+(3, 6, 's20120212', 'Jose Martin', 'García', 'Martínez', 's20120212@alumnos.itsur.edu.mx', 'ING GESTION EMPRESARIAL', 7, '4452163920', 3);
 
 -- --------------------------------------------------------
 
@@ -149,23 +153,30 @@ CREATE TABLE IF NOT EXISTS `tarea` (
   `descripcion` text,
   `id_Actividad` int NOT NULL,
   `id_Estudiante` varchar(9) NOT NULL,
+  `Estatus` tinyint(1) NOT NULL,
+  `Anotaciones` varchar(300) NOT NULL,
   PRIMARY KEY (`id_Tarea`),
   KEY `tarea_act_asig` (`id_Actividad`)
-) ENGINE=MyISAM AUTO_INCREMENT=96 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `tarea`
 --
 
-INSERT INTO `tarea` (`id_Tarea`, `nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`) VALUES
-(90, 'ACT FINAL', 'ijm', 62, 's20120212'),
-(89, 'ACT FINAL', 'JHBNJ', 62, 's20120176'),
-(88, 'ACT FINAL', 'mnjhbvghbnj', 62, 's20120224'),
-(91, 'N2', 'mnjhbvghbnj', 63, 's20120224'),
-(92, 'N2', 'NUEVO', 63, 's20120176'),
-(93, 'm jm', 'mnjhbvghbnj', 64, 's20120224'),
-(94, 'm jm', 'NUEVO', 64, 's20120176'),
-(95, 'm jm', 'jnjnjn', 64, 's20120212');
+INSERT INTO `tarea` (`id_Tarea`, `nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`, `Estatus`, `Anotaciones`) VALUES
+(90, 'ACT FINAL', 'ijm', 62, 's20120212', 1, ''),
+(89, 'ACT FINAL', 'JHBNJ', 62, 's20120176', 0, ''),
+(88, 'ACT FINAL', 'mnjhbvghbnj', 62, 's20120224', 0, ''),
+(91, 'N2', 'mnjhbvghbnj', 63, 's20120224', 0, ''),
+(92, 'N2', 'NUEVO', 63, 's20120176', 0, ''),
+(93, 'm jm', 'mnjhbvghbnj', 64, 's20120224', 0, ''),
+(94, 'm jm', 'NUEVO', 64, 's20120176', 0, ''),
+(95, 'm jm', 'jnjnjn', 64, 's20120212', 0, ''),
+(96, 'ACT ESTATUS', 'MK', 65, 's20120224', 0, ''),
+(97, 'ACT ESTATUS', 'KMNIM', 65, 's20120176', 0, ''),
+(98, 'ACT ESTATUS', 'NJUIJ', 65, 's20120212', 1, ''),
+(99, 'ESTADO', 'ESTADO', 66, 's20120212', 1, ''),
+(100, 'ESTADO', 'MA', 66, 's20120224', 0, '');
 
 -- --------------------------------------------------------
 
@@ -188,7 +199,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 
 INSERT INTO `usuarios` (`id_User`, `usuario`, `contrasena`, `tipo_us`) VALUES
 (1, 'jesseLoco', 'eljesse', 'Admin'),
-(2, 'Jose', '12345', 'Admin'),
+(2, 'Jose', '12345', 'Docente'),
 (3, 'Azu', '12345', 'Docente'),
 (4, 'David', '12345', 'Docente'),
 (5, 'Sofia', '12345', 'Estudiante'),
