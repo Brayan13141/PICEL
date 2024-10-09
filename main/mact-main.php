@@ -36,21 +36,14 @@ if ($_SESSION['id_User']) {
                     $id_Act = $_GET['id_A'];
                     if ($_SESSION['tipo_us'] == "Admin") {
 
-                        $query2 = "SELECT id_Docente FROM docentes WHERE id_User = '" .  $id_Docente  . "'";
-                        if ($result = $link->query($query2)) {
-                            while ($row = $result->fetch_assoc()) {
-                                $id_Docente = $row["id_Docente"];
-                            }
-                            $result->free();
-                        }
-
-                        $query3 = "SELECT DISTINCT  concat(e.nombre,' ',e.apellidoP,' ',e.apellidoM) AS nombre_completo , t.nombre,t.descripcion 
+                        $query3 = "SELECT DISTINCT  concat(e.nombre,' ',e.apellidoP,' ',e.apellidoM) AS nombre_completo ,
+                         t.nombre,t.Estatus as estado,t.descripcion,t.Anotaciones 
                         FROM tarea t, actividades_asignadas a, estudiantes e, docentes d
                         WHERE t.id_Estudiante = e.num_control
                         AND  a.id_Evento = '$id_Evento' AND '$id_Docente' = a.id_Docente 
                         AND a.id_Actividades = '$id_Act'
                         AND a.id_Actividades = t.id_Actividad";
-                    } 
+                    }
                     if ($_SESSION['tipo_us'] == "Docente") {
 
                         $query2 = "SELECT id_Docente FROM docentes WHERE id_User = '" . $_SESSION['id_User'] . "'";
@@ -61,20 +54,20 @@ if ($_SESSION['id_User']) {
                             $result->free();
                         }
 
-                        $query3 = "SELECT DISTINCT concat(e.nombre,' ',e.apellidoP,' ',e.apellidoM) AS nombre_completo , t.nombre,t.descripcion 
+                        $query3 = "SELECT DISTINCT concat(e.nombre,' ',e.apellidoP,' ',e.apellidoM) AS nombre_completo,
+                        t.nombre,t.Estatus as estado,t.descripcion,t.Anotaciones 
                         FROM tarea t, actividades_asignadas a, estudiantes e, docentes d
                         WHERE t.id_Estudiante = e.num_control
                         AND  a.id_Evento = '$id_Evento' AND '$id_Docente' = a.id_Docente 
                         AND a.id_Actividades = '$id_Act'
                         AND a.id_Actividades = t.id_Actividad";
-                        
                     }
 
 
 
                     echo '<div class="col-12 pt-2 text-center">
                         <h3>Monitorear Actividad</h3>
-                    </div>';
+                          </div>';
                     echo '
                     <table class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
                         <tr> 
@@ -92,14 +85,16 @@ if ($_SESSION['id_User']) {
                             $Nombreact = $row["nombre"];
                             $name_completo = $row["nombre_completo"];
                             $descripcion = $row["descripcion"];
+                            $estatus = $row["estado"] ? "Entregado" : "Pendiente";
+                            $anotaciones = $row["Anotaciones"];
 
                             echo '<tr> 
                                     <td>' . $name_completo . '</td> 
                                     <td>' . $Nombreact . '</td> 
                                     <td>' . $descripcion . '</td> 
-                                    <td>0%</td> 
-                                    <td>Nada</td> 
-                                    <td>Incompleta</td>
+                                    <td >' . $estatus  . '</td>
+                                    <td>Nada</td>
+                                    <td>' . $anotaciones . '</td>
                                 </tr>';
                         }
                         echo "</table>";
