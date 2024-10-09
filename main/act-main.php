@@ -15,6 +15,7 @@
         <link href="../css/estilo.css?v=<?php echo time(); ?>" rel="stylesheet">
         <script src="../js/jquery-3.6.0.min.js"></script>
         <script src="../js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     </head>
 
@@ -73,7 +74,11 @@
                                         COUNT(t.id_Estudiante) AS no_estudiantes,
                                         CONCAT(d.nombre, ' ', d.apellidoP) AS docente,
                                         d.id_Docente AS id_docente,
-                                        a.id_Actividades AS id_actividad
+                                        a.id_Actividades AS id_actividad,
+                                        (SELECT ROUND((SUM(CASE WHEN Estatus = 1 THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) AS porcentaje_entregadas
+                                        FROM tarea 
+                                        WHERE id_Actividad = a.id_Actividades
+                                        GROUP BY id_Actividad) AS porcentaje_entregadas
                                         FROM 
                                             actividades_asignadas a
                                         JOIN 
@@ -97,8 +102,49 @@
                                             <td>' . (!empty($row_d0[0]) ? $row_d0[0] : '') . '</td> 
                                             <td>' . (!empty($row_d0[1]) ? $row_d0[1] : '') . '</td> 
                                             <td>' . (!empty($row_d0[2]) ? $row_d0[2] : '') . '</td>
-                                            <td>' . (!empty($row_d0[0]) ? $row_d0[3] : '') . '</td>  
-                                            <td>0%</td>
+                                            <td>' . (!empty($row_d0[3]) ? $row_d0[3] : '') . '</td>  
+                                            
+                                            <td>
+
+                                            <canvas id="chart-' . $row_d0[5] . '" width="100" height="100"></canvas>
+                                                <style>
+                                                #chart-' . $row_d0[5] . ' {
+                                                    width: 120px !important;
+                                                    height: 120px !important;
+                                                }
+                                                </style>
+                                            <div id="percentage-' . $row_d0[5] . '" style="text-align: center; font-size: 16px; margin-top: 10px;"></div>
+                                            <script>
+                                                var ctx = document.getElementById("chart-' . $row_d0[5] . '").getContext("2d");
+                                                var percentage = ' . $row_d0[6] . ';
+                                                var myChart = new Chart(ctx, {
+                                                    type: "doughnut",
+                                                    data: {
+                                                        datasets: [{
+                                                            data: [percentage, 100 - percentage],
+                                                            backgroundColor: ["#4caf50", "#ffeb3b"]
+                                                        }],
+                                                        labels: ["Entregado", "Pendiente"]
+                                                    },
+                                                    options: {
+                                                        cutout: "70%",
+                                                        responsive: true,
+                                                        plugins: {
+                                                            tooltip: {
+                                                                callbacks: {
+                                                                    label: function(context) {
+                                                                        return context.label + ": " + context.raw + "%";
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                                // Mostrar el porcentaje debajo del gráfico
+                                                document.getElementById("percentage-' . $row_d0[5] . '").innerHTML = percentage + "% Entregado";
+                                            </script>
+                                            </td>
+
                                             <td>
                                             <button type="button" onclick="enviarDatos(' . $id_Evento . ',' . $row_d0[4] . ',' . $row_d0[5] . ');" 
                                             class="mx-auto btn btn-success">DETALLES</button>
@@ -123,7 +169,11 @@
                                         COUNT(t.id_Estudiante) AS no_estudiantes,
                                         CONCAT(d.nombre, ' ', d.apellidoP) AS docente,
                                         d.id_Docente AS id_docente,
-                                        a.id_Actividades AS id_actividad
+                                        a.id_Actividades AS id_actividad,
+                                        (SELECT ROUND((SUM(CASE WHEN Estatus = 1 THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) AS porcentaje_entregadas
+                                        FROM tarea 
+                                        WHERE id_Actividad = a.id_Actividades
+                                        GROUP BY id_Actividad) AS porcentaje_entregadas
                                         FROM 
                                             actividades_asignadas a
                                         JOIN 
@@ -135,7 +185,7 @@
                                         LEFT JOIN 
                                             estudiantes e ON t.id_Estudiante = e.id_Estudiante -- obtener información de los estudiantes
                                         WHERE 
-                                            a.id_Docente = $id_Docente
+                                            a.id_Docente = $id_Docente AND  a.id_Evento = $id_Evento
                                         GROUP BY 
                                             a.Nombre, ev.nombre, d.nombre, d.apellidoP, a.id_Actividades, d.id_Docente;";
                                     $result_d0 = $link->query($query_d0);
@@ -147,8 +197,48 @@
                                             <td>' . (!empty($row_d0[0]) ? $row_d0[0] : '') . '</td> 
                                             <td>' . (!empty($row_d0[1]) ? $row_d0[1] : '') . '</td> 
                                             <td>' . (!empty($row_d0[2]) ? $row_d0[2] : '') . '</td>
-                                            <td>' . (!empty($row_d0[0]) ? $row_d0[3] : '') . '</td>  
-                                            <td>0%</td>
+                                            <td>' . (!empty($row_d0[3]) ? $row_d0[3] : '') . '</td>   
+                                             <td>
+                                            <canvas id="chart-' . $row_d0[5] . '" width="100" height="100"></canvas>
+                                            <style>
+                                            #chart-' . $row_d0[5] . ' {
+                                                width: 120px !important;
+                                                height: 120px !important;
+                                            }
+                                            </style>
+                                            <div id="percentage-' . $row_d0[5] . '" style="text-align: center; font-size: 16px; margin-top: 10px;"></div>
+                                            <script>
+                                                var ctx = document.getElementById("chart-' . $row_d0[5] . '").getContext("2d");
+                                                var percentage = ' . $row_d0[6] . ';
+                                                var myChart = new Chart(ctx, {
+                                                    type: "doughnut",
+                                                    data: {
+                                                        datasets: [{
+                                                            data: [percentage, 100 - percentage],
+                                                            backgroundColor: ["#4caf50", "#ffeb3b"]
+                                                        }],
+                                                        labels: ["Entregado", "Pendiente"]
+                                                    },
+                                                    options: {
+                                                        cutout: "70%",
+                                                        responsive: true,
+                                                        plugins: {
+                                                            tooltip: {
+                                                                callbacks: {
+                                                                    label: function(context) {
+                                                                        return context.label + ": " + context.raw + "%";
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                                
+                                                // Mostrar el porcentaje debajo del gráfico
+                                                document.getElementById("percentage-' . $row_d0[5] . '").innerHTML = percentage + "% Entregado";
+                                            </script>
+                                            </td>
+
                                             <td>
                                             <button type="button" onclick="enviarDatos(' . $id_Evento . ',' . $row_d0[4] . ',' . $row_d0[5] . ');" 
                                             class="mx-auto btn btn-success">DETALLES</button>
@@ -156,8 +246,6 @@
                                             </td>
                                             </tr>';
                                         }
-                                    } else {
-                                        echo "0 resultados";
                                     }
                                 }
                                 echo "</table>";
@@ -294,6 +382,16 @@
 
             ?>
     </body>
+    <style>
+table {
+    width: 100%;
+}
+
+td {
+    text-align: center;
+    vertical-align: middle;
+}
+    </style>
 
     </html>
     <?php
