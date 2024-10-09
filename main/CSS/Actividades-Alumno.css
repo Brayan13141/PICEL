@@ -1,0 +1,103 @@
+.actividad-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.actividad-card:hover {
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    background-color: #f0f1f1bc;
+}
+
+.actividad-header {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    justify-content: center;
+    display: flex;
+}
+
+.actividad-body p {
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.actividad-footer {
+    margin-top: 20px;
+}
+
+.badge-pendiente {
+    background-color: #ffc107;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.badge-entregado {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.form-control-file {
+    margin-top: 10px;
+}
+
+.btn-primary {
+    margin-top: 10px;
+}
+.D_D {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    justify-content: space-around;
+}
+.Status {
+    position: absolute;
+}
+.custom-file-input {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: calc(1.5em + 0.75rem + 2px);
+    margin-bottom: 0.5rem;
+    color: #495057;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.custom-file-input:hover {
+    cursor: pointer;
+    background-color: #e9ecef;
+}
+
+.custom-file-label {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    height: 100%;
+    padding: 0.375rem 0.75rem;
+    line-height: 1.5;
+    color: #495057;
+    pointer-events: none;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    font-size: 14px;
+}
+
+.custom-file-input:focus + .custom-file-label {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
