@@ -51,7 +51,6 @@
             echo "Error: " . $e->getMessage();
         }
     }
-
     //----------------------------------INSERTAR-ACTUALIZAR--------------------------------
     if (
         isset($_POST['numerocontrol']) && !empty($_POST['numerocontrol']) &&
@@ -76,7 +75,7 @@
             $correo = antiscript($_POST['correoinstituto']);
             $usuario = antiscript($_POST['usuario']);
             $password = antiscript($_POST['password']);
-            
+
             $sql = "SELECT * FROM estudiantes WHERE num_control = '$numerocontrol'";
             $complet = $link->query($sql);
 
@@ -84,14 +83,16 @@
             $id_User = $row['id_User'];
 
 
-            if (mysqli_num_rows($complet) == 0 && is_null(isset($_SESSION['editar'])) && is_null(isset($_SESSION['idEditar']))) {
+            if (mysqli_num_rows($complet) == 0 && is_null($_SESSION['editar'])) {
                 $insert1 = "INSERT INTO usuarios(usuario, contrasena, tipo_us) 
             VALUES ('$usuario','$password','Estudiante')";
                 if ($link->query($insert1)) {
-                    $insert2 = "INSERT INTO estudiantes(id_User,num_control, nombre,apellidoP,apellidoM, correo, carrera, semestre, num_celular) 
+                    $insert2 = "INSERT INTO estudiantes(id_User,num_control,nombre,apellidoP,apellidoM, correo, carrera, semestre, num_celular,id_Docente) 
                 VALUES ( (SELECT id_User FROM USUARIOS
                 ORDER BY id_User DESC
-                LIMIT 1 ),'$numerocontrol', '$nombre', '$apellidoP', '$apellidoM', '$correo', '$carrera', '$semestre', '$telefono')";
+                LIMIT 1 ),'$numerocontrol', '$nombre', '$apellidoP', '$apellidoM', '$correo', '$carrera', '$semestre', '$telefono',
+                (SELECT id_Docente FROM docentes WHERE id_User = " . $_SESSION['id_User'] . ")
+                )";
                     if ($link->query($insert2)) {
                         header('Location: ../main/re-main.php?mensaje=ESTUDIANTE REGISTRADO');
                     } else {
@@ -121,8 +122,7 @@
                     header('Location: ../main/re-main.php?mensaje=ERROR AL ACTUALIZAR EL ESTUDIANTE(ERROR)');
                 }
             } else {
-                header('Location: ../main/re-main.php?mensaje=ESTE ESTUDIANTE YA EXISTE');
-
+                header('Location: ../main/re-main.php?mensaje=ESTE ESTUDIANTE YA EXISTE 1');
                 exit();
             }
         } catch (Exception $e) {
