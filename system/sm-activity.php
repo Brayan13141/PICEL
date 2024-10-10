@@ -87,4 +87,22 @@ if (isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin" || $_SESSION[
       echo "<script>location.href='../main/act-main.php?mensaje=COMPLETA TODOS LOS CAMPOS'</script>";
     }
   }
+
+  if (
+    isset($_POST['accion'])  && isset($_POST['id_registro']) &&
+    (isset($_POST['accion']) == "eliminar_registro")
+  ) {
+    try {
+      $id_registro = antiscript($_POST['id_registro']);
+      $BORRAR_ACT = "DELETE FROM actividades_asignadas WHERE id_Actividades=" . $id_registro;
+      if ($link->query($BORRAR_ACT)) {
+        echo json_encode(array("success" => true));
+      } else {
+        header('Location: ../main/act-main.php?mensaje=ERROR AL BORRAR EL ESTUDIANTE');
+      }
+    } catch (Exception $e) {
+      // Manejo de excepciones
+      echo "Error: " . $e->getMessage();
+    }
+  }
 }
