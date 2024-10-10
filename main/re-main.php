@@ -1,14 +1,14 @@
 <?php
 session_start();
 if (isset($_SESSION['tipo_us']) != "Admin") {
-  header("Location: index.php");
+    header("Location: index.php");
 }
 if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin") ||
-  (isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Docente")
+    (isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Docente")
 ) {
-  include('../system/conexion.php');
-  $_SESSION['editar'] = '';
-  $_SESSION['IdEditar'] = '';
+    include('../system/conexion.php');
+    $_SESSION['editar'] = null;
+    $_SESSION['IdEditar'] = null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,8 +29,8 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin") ||
 
 <body>
     <?php
-    require('menu.php');
-    ?>
+        require('menu.php');
+        ?>
     <div class="container margen">
         <div class="row mt-3">
             <div class="col"><button type="button" onclick="load(0);"
@@ -45,7 +45,7 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin") ||
             </div>
             <div class="grid mx-auto col-md-12">
                 <?php
-          echo '<table class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
+                    echo '<table class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
         <tr> 
               <td><strong><p>No. Control</p></strong></td>
               <td><strong><p>Nombre</p></strong></td>
@@ -56,40 +56,40 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin") ||
               <td><strong><p>Opciones</p></strong></td>
         </tr>';
 
-          if ($_SESSION['tipo_us'] == "Admin") {
-            $query = "SELECT * FROM estudiantes";
-          } else if ($_SESSION['tipo_us'] == "Docente") {
-            $query = "SELECT * FROM estudiantes WHERE id_Docente = (SELECT id_Docente FROM docentes WHERE id_User = " . $_SESSION['id_User'] . ")";
-          }
+                    if ($_SESSION['tipo_us'] == "Admin") {
+                        $query = "SELECT * FROM estudiantes";
+                    } else if ($_SESSION['tipo_us'] == "Docente") {
+                        $query = "SELECT * FROM estudiantes WHERE id_Docente = (SELECT id_Docente FROM docentes WHERE id_User = " . $_SESSION['id_User'] . ")";
+                    }
 
-          if ($result = $link->query($query)) {
-            while ($row = $result->fetch_assoc()) {
-              $ncon = $row["num_control"];
-              $name = $row["nombre"] . " " . $row["apellidoP"] . " " . $row["apellidoM"];
-              $correo = $row["correo"];
-              $carr = $row["carrera"];
-              $sem = $row["semestre"];
-              $cel = $row["num_celular"];
-              $id_E = $row["id_Estudiante"];
+                    if ($result = $link->query($query)) {
+                        while ($row = $result->fetch_assoc()) {
+                            $ncon = $row["num_control"];
+                            $name = $row["nombre"] . " " . $row["apellidoP"] . " " . $row["apellidoM"];
+                            $correo = $row["correo"];
+                            $carr = $row["carrera"];
+                            $sem = $row["semestre"];
+                            $cel = $row["num_celular"];
+                            $id_E = $row["id_Estudiante"];
 
-              echo '<tr> 
-                    <td>' . $ncon . '</td> 
-                    <td>' . $name . '</td> 
-                    <td>' . $correo . '</td>
-                    <td>' . $carr . '</td> 
-                    <td>' . $sem . '</td> 
-                    <td>' . $cel . '</td> 
+                            echo '<tr> 
+                            <td>' . $ncon . '</td> 
+                            <td>' . $name . '</td> 
+                            <td>' . $correo . '</td>
+                            <td>' . $carr . '</td> 
+                            <td>' . $sem . '</td> 
+                            <td>' . $cel . '</td> 
                        <td>
                         <button type="button" class="btn btn-sm btn-primary" onclick="editarAlumno(' . $id_E . ')">Editar</button>
                         <button type="button" id="btnEliminar" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="modal(' . $id_E . ',' . '\'' . addslashes($name) . '\')">Eliminar</button>
                        </td> 
                 </tr>';
-            }
-            echo "</table>";
+                        }
+                        echo "</table>";
 
-            $result->free();
-          }
-          ?>
+                        $result->free();
+                    }
+                    ?>
             </div>
         </div>
 
@@ -200,8 +200,8 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin") ||
     </div>
 
     <?php
-    if (isset($_GET['mensaje'])) {
-    ?>
+        if (isset($_GET['mensaje'])) {
+        ?>
     <div class="modal fade" id="ModalMensaje" style="border: 1px solid black;" tabindex="-3">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -214,12 +214,12 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin") ||
                 </div>
                 <div class="modal-body">
                     <p id="LabelModal"><?php
-                                  if (isset($_GET['mensaje'])) {
-                                    echo $_GET['mensaje'];
-                                  } else {
-                                    echo "";
-                                  }
-                                  ?></p>
+                                                if (isset($_GET['mensaje'])) {
+                                                    echo $_GET['mensaje'];
+                                                } else {
+                                                    echo "";
+                                                }
+                                                ?></p>
                 </div>
                 <div class="modal-footer" style=" background-color: #5fbc18;">
                     <h6>Da clic fuera del mensaje para continuar</h6>
@@ -228,7 +228,7 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin") ||
         </div>
     </div>
     <?php
-      echo '<script>
+            echo '<script>
        // Esperamos a que el documento se haya cargado completamente
        document.addEventListener("DOMContentLoaded", function() {
          // Seleccionamos el modal
@@ -237,8 +237,8 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin") ||
          modal.show();
        });
      </script>';
-    }
-    ?>
+        }
+        ?>
     <?php include('footer.php'); ?>
     </div>
 </body>
