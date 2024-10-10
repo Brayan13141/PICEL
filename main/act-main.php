@@ -128,7 +128,7 @@
                                                     },
                                                     options: {
                                                         cutout: "70%",
-                                                        responsive: true,
+                                                        responsive: false,
                                                         plugins: {
                                                             tooltip: {
                                                                 callbacks: {
@@ -148,7 +148,8 @@
                                             <td>
                                             <button type="button" onclick="enviarDatos(' . $id_Evento . ',' . $row_d0[4] . ',' . $row_d0[5] . ');" 
                                             class="mx-auto btn btn-success">DETALLES</button>
-                                            <button  class="mx-auto btn btn-danger">ELIMINAR</button>
+                                           <button class="mx-auto btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                            onclick="modal(' . $row_d0[5] . ',\'' . $row_d0[0] . '\')">ELIMINAR</button>
                                             </td>
                                             </tr>';
                                         }
@@ -221,7 +222,7 @@
                                                     },
                                                     options: {
                                                         cutout: "70%",
-                                                        responsive: true,
+                                                        responsive: false,
                                                         plugins: {
                                                             tooltip: {
                                                                 callbacks: {
@@ -336,6 +337,37 @@
             </div>
         </div>
 
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true"
+            style="border: 1px solid black;">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #5fbc18; position: relative;">
+                        <div style="position: absolute; left: 10px;">
+                            <img src="../imgs/logorecortado.png" class="img-fluid" alt="PICEL" width="55">
+                        </div>
+                        <h5 class="modal-title w-100 text-center" id="deleteModalLabel">Confirmar Eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            ¿Estás seguro de que deseas eliminar a
+                            <strong>
+                                <label id="Nombre-Modal">
+                                </label>
+                            </strong>
+                            ?
+                        </p>
+                        <label>Esta acción no se puede deshacer.</label>
+                    </div>
+                    <div class="modal-footer" style=" background-color: #5fbc18;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            style="border: 1px solid black;">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="confirmDelete"
+                            style="border: 1px solid black;">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <?php
             if (isset($_GET['mensaje'])) {
             ?>
@@ -365,8 +397,7 @@
             </div>
         </div>
         <?php
-                echo '   <script>
-        // Esperamos a que el documento se haya cargado completamente
+                echo '   <script> 
             document.addEventListener("DOMContentLoaded", function() {
             // Seleccionamos el modal
             var modal = new bootstrap.Modal(document.getElementById("ModalMensaje"));
@@ -390,6 +421,11 @@ table {
 td {
     text-align: center;
     vertical-align: middle;
+}
+
+td button {
+    display: flex !important;
+    flex-direction: column !important;
 }
     </style>
 
