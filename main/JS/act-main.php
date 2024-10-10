@@ -33,7 +33,33 @@ document.addEventListener("DOMContentLoaded", () => {
             actualizarCampos(limite);
         });
 
+    document.getElementById("confirmDelete").addEventListener("click", function() {
+        eliminarAct(idAct);
+    });
+
 });
+let idAct;
+
+function eliminarAct(idRegistro) {
+    // Eliminar el registro con ID "idRegistro" de la base de datos
+    try {
+        $.ajax({
+            url: "../system/sm-activity.php",
+            type: "POST",
+            data: {
+                accion: "eliminar_registro",
+                id_registro: parseInt(idRegistro),
+            },
+            success: function(respuesta) {
+                window.location.href = "./act-main.php?mensaje=SE ELIMINO CORRECTAMENTE";
+            },
+        });
+    } catch (e) {
+        window.location.href =
+            "./act-main.php?mensaje=ERROR AL ELIMINAR EL REGISTRO" + e;
+    }
+}
+
 
 function enviarDatos(idEvento, id_Docente, id_actividad) {
     // Construimos la URL con los parámetros que queremos enviar 
@@ -43,6 +69,10 @@ function enviarDatos(idEvento, id_Docente, id_actividad) {
     window.location.href = url;
 }
 
+function modal(id, Nombre) {
+    document.getElementById("Nombre-Modal").innerText = Nombre;
+    idAct = id;
+}
 
 function load(id) {
     if (id == 0) {
