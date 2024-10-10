@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 09-10-2024 a las 06:16:44
+-- Tiempo de generación: 10-10-2024 a las 01:11:50
 -- Versión del servidor: 8.3.0
 -- Versión de PHP: 8.2.18
 
@@ -44,8 +44,6 @@ CREATE TABLE IF NOT EXISTS `actividades_asignadas` (
 --
 
 INSERT INTO `actividades_asignadas` (`id_Actividades`, `id_Evento`, `fecha_ini`, `id_Docente`, `Nombre`) VALUES
-(64, 1, '2023-12-15', 2, 'm jm'),
-(63, 1, '2023-01-15', 5, 'N2'),
 (62, 1, '2023-12-15', 5, 'ACT FINAL'),
 (65, 2, '2023-01-15', 2, 'ACT ESTATUS'),
 (66, 3, '2023-01-15', 3, 'ESTADO');
@@ -102,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `estudiantes` (
   PRIMARY KEY (`id_Estudiante`),
   KEY `FK_Estudiantes_Usuario` (`id_User`),
   KEY `FK_Estudiantes_Docentes` (`id_Docente`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `estudiantes`
@@ -169,9 +167,6 @@ INSERT INTO `tarea` (`id_Tarea`, `nombre`, `descripcion`, `id_Actividad`, `id_Es
 (88, 'ACT FINAL', 'mnjhbvghbnj', 62, 's20120224', 0, ''),
 (91, 'N2', 'mnjhbvghbnj', 63, 's20120224', 0, ''),
 (92, 'N2', 'NUEVO', 63, 's20120176', 0, ''),
-(93, 'm jm', 'mnjhbvghbnj', 64, 's20120224', 0, ''),
-(94, 'm jm', 'NUEVO', 64, 's20120176', 0, ''),
-(95, 'm jm', 'jnjnjn', 64, 's20120212', 0, ''),
 (96, 'ACT ESTATUS', 'MK', 65, 's20120224', 0, ''),
 (97, 'ACT ESTATUS', 'KMNIM', 65, 's20120176', 0, ''),
 (98, 'ACT ESTATUS', 'NJUIJ', 65, 's20120212', 1, ''),
@@ -191,7 +186,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `contrasena` varchar(250) NOT NULL,
   `tipo_us` enum('Admin','Estudiante','Docente') NOT NULL,
   PRIMARY KEY (`id_User`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
@@ -204,7 +199,8 @@ INSERT INTO `usuarios` (`id_User`, `usuario`, `contrasena`, `tipo_us`) VALUES
 (4, 'David', '12345', 'Docente'),
 (5, 'Sofia', '12345', 'Estudiante'),
 (6, 'Pedro', '12345', 'Estudiante'),
-(8, 'BRAYAN', '12345', 'Admin');
+(8, 'BRAYAN', '12345', 'Admin'),
+(9, 'B', '12345', 'Estudiante');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
