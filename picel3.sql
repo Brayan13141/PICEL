@@ -1,61 +1,36 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 10-10-2024 a las 01:11:50
--- Versión del servidor: 8.3.0
--- Versión de PHP: 8.2.18
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de datos: `picel3`
---
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `actividades_asignadas`
---
-
+-- =====================================================================
+-- 1. Eliminar tablas y base de datos si existen
+-- =====================================================================
+DROP TABLE IF EXISTS `tarea`;
 DROP TABLE IF EXISTS `actividades_asignadas`;
-CREATE TABLE IF NOT EXISTS `actividades_asignadas` (
-  `id_Actividades` int NOT NULL AUTO_INCREMENT,
-  `id_Evento` int NOT NULL,
-  `fecha_ini` varchar(30) NOT NULL,
-  `id_Docente` int NOT NULL,
-  `Nombre` varchar(100) NOT NULL,
-  PRIMARY KEY (`id_Actividades`),
-  KEY `FK_Actividades_Evento` (`id_Evento`),
-  KEY `fk_estudiante` (`id_Docente`)
-) ENGINE=MyISAM AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `actividades_asignadas`
---
-
-INSERT INTO `actividades_asignadas` (`id_Actividades`, `id_Evento`, `fecha_ini`, `id_Docente`, `Nombre`) VALUES
-(62, 1, '2023-12-15', 5, 'ACT FINAL'),
-(65, 2, '2023-01-15', 2, 'ACT ESTATUS'),
-(66, 3, '2023-01-15', 3, 'ESTADO');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `docentes`
---
-
+DROP TABLE IF EXISTS `evento`;
+DROP TABLE IF EXISTS `estudiantes`;
 DROP TABLE IF EXISTS `docentes`;
-CREATE TABLE IF NOT EXISTS `docentes` (
+DROP TABLE IF EXISTS `usuarios`;
+
+DROP DATABASE IF EXISTS PICEL3;
+
+-- =====================================================================
+-- 2. Crear la base de datos y usarla
+-- =====================================================================
+CREATE DATABASE PICEL3;
+USE PICEL3;
+
+-- =====================================================================
+-- 3. Crear tabla de usuarios
+-- =====================================================================
+CREATE TABLE `usuarios` (
+  `id_User` int NOT NULL AUTO_INCREMENT,
+  `usuario` varchar(100) NOT NULL,
+  `contrasena` varchar(250) NOT NULL,
+  `tipo_us` enum('Admin','Estudiante','Docente') NOT NULL,
+  PRIMARY KEY (`id_User`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================================
+-- 4. Crear tabla de docentes
+-- =====================================================================
+CREATE TABLE `docentes` (
   `id_Docente` int NOT NULL AUTO_INCREMENT,
   `id_User` int DEFAULT NULL,
   `nombre` varchar(50) NOT NULL,
@@ -65,27 +40,13 @@ CREATE TABLE IF NOT EXISTS `docentes` (
   `carrera` varchar(35) NOT NULL,
   `num_celular` char(10) NOT NULL,
   PRIMARY KEY (`id_Docente`),
-  KEY `FK_Docentes_Usuarios` (`id_User`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  FOREIGN KEY (`id_User`) REFERENCES `usuarios`(`id_User`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `docentes`
---
-
-INSERT INTO `docentes` (`id_Docente`, `id_User`, `nombre`, `apellidoP`, `apellidoM`, `correo`, `carrera`, `num_celular`) VALUES
-(1, 4, 'Juan pablo', 'Villa', 'Villagomez', 'JuanViVi@Docentes.itsur.edu.mx', 'ING ELECTRONICA', '4174567898'),
-(2, 2, 'Dominic', 'Camargo', 'Ruiz', 'Comino@Docentes.itsur.edu.mx', 'ING ELECTRONICA', '4171124565'),
-(3, 3, 'Socorro', 'García', 'Perez', 'SocorroGaPe@Docentes.itsur.edu.mx', 'ING GESTION EMPRESARIAL', '4454578967'),
-(5, 8, 'BRAYAN', 'SANCHEZ', 'MONROY', 'S290@ALUMNOS.COM', 'ING SISTEMAS COMPUTACIONALES', '123451');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `estudiantes`
---
-
-DROP TABLE IF EXISTS `estudiantes`;
-CREATE TABLE IF NOT EXISTS `estudiantes` (
+-- =====================================================================
+-- 5. Crear tabla de estudiantes
+-- =====================================================================
+CREATE TABLE `estudiantes` (
   `id_Estudiante` int NOT NULL AUTO_INCREMENT,
   `id_User` int DEFAULT NULL,
   `num_control` char(9) NOT NULL,
@@ -93,116 +54,171 @@ CREATE TABLE IF NOT EXISTS `estudiantes` (
   `apellidoP` varchar(50) NOT NULL,
   `apellidoM` varchar(50) NOT NULL,
   `correo` varchar(50) NOT NULL,
-  `carrera` varchar(25) NOT NULL,
+  `carrera` varchar(50) NOT NULL,
   `semestre` int NOT NULL,
   `num_celular` char(10) NOT NULL,
   `id_Docente` int NOT NULL,
   PRIMARY KEY (`id_Estudiante`),
-  KEY `FK_Estudiantes_Usuario` (`id_User`),
-  KEY `FK_Estudiantes_Docentes` (`id_Docente`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  FOREIGN KEY (`id_User`) REFERENCES `usuarios`(`id_User`) ON DELETE SET NULL,
+  FOREIGN KEY (`id_Docente`) REFERENCES `docentes`(`id_Docente`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `estudiantes`
---
-
-INSERT INTO `estudiantes` (`id_Estudiante`, `id_User`, `num_control`, `nombre`, `apellidoP`, `apellidoM`, `correo`, `carrera`, `semestre`, `num_celular`, `id_Docente`) VALUES
-(1, 1, 's20120224', 'Jesse Santiago', 'Barrera', 'Zuñiga', 's20120224@alumnos.itsur.edu.mx', 'ING SISTEMAS COMPUTACIONA', 7, '4171128536', 1),
-(2, 2, 's20120176', 'Azucena', 'Camargo', 'Ruiz', 's20120176@alumnos.itsur.edu.mx', 'ING AMBIENTAL', 7, '4171027589', 2),
-(3, 6, 's20120212', 'Jose Martin', 'García', 'Martínez', 's20120212@alumnos.itsur.edu.mx', 'ING GESTION EMPRESARIAL', 7, '4452163920', 3);
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `evento`
---
-
-DROP TABLE IF EXISTS `evento`;
-CREATE TABLE IF NOT EXISTS `evento` (
+-- =====================================================================
+-- 6. Crear tabla de eventos
+-- =====================================================================
+CREATE TABLE `evento` (
   `id_Evento` int NOT NULL AUTO_INCREMENT,
   `id_Docente` int NOT NULL,
   `periodo` varchar(50) NOT NULL,
   `nombre` text NOT NULL,
   `descripcion` text,
   PRIMARY KEY (`id_Evento`),
-  KEY `FK_Evento_Docente` (`id_Docente`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  FOREIGN KEY (`id_Docente`) REFERENCES `docentes`(`id_Docente`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `evento`
---
+-- =====================================================================
+-- 7. Crear tabla de actividades asignadas
+-- =====================================================================
+CREATE TABLE `actividades_asignadas` (
+  `id_Actividades` int NOT NULL AUTO_INCREMENT,
+  `id_Evento` int NOT NULL,
+  `fecha_ini` varchar(30) NOT NULL,
+  `id_Docente` int NOT NULL,
+  `Nombre` varchar(100) NOT NULL,
+  PRIMARY KEY (`id_Actividades`),
+  FOREIGN KEY (`id_Evento`) REFERENCES `evento`(`id_Evento`) ON DELETE CASCADE,
+  FOREIGN KEY (`id_Docente`) REFERENCES `docentes`(`id_Docente`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `evento` (`id_Evento`, `id_Docente`, `periodo`, `nombre`, `descripcion`) VALUES
-(1, 1, 'AGO-DIC', 'Deletreo master', 'NADA'),
-(2, 2, 'ENE-JUL', 'Trivia', 'Se realizarán la lectura de un libro del cual se responderan preguntas de diversas parte del libro'),
-(3, 3, 'ENE-JUL', 'Dibujo', 'Los participantes dibujarán un personaje de día de muestos que sera original'),
-(4, 3, 'AGO-JUL', 'Calaberita', 'Los participantes harán una calaberita sobre algun maestro.');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `tarea`
---
-
-DROP TABLE IF EXISTS `tarea`;
-CREATE TABLE IF NOT EXISTS `tarea` (
+-- =====================================================================
+-- 8. Crear tabla de tareas
+-- =====================================================================
+CREATE TABLE `tarea` (
   `id_Tarea` int NOT NULL AUTO_INCREMENT,
   `nombre` text NOT NULL,
   `descripcion` text,
   `id_Actividad` int NOT NULL,
-  `id_Estudiante` varchar(9) NOT NULL,
+  `id_Estudiante` int NOT NULL,
   `Estatus` tinyint(1) NOT NULL,
   `Anotaciones` varchar(300) NOT NULL,
   PRIMARY KEY (`id_Tarea`),
-  KEY `tarea_act_asig` (`id_Actividad`)
-) ENGINE=MyISAM AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  FOREIGN KEY (`id_Actividad`) REFERENCES `actividades_asignadas`(`id_Actividades`) ON DELETE CASCADE,
+  FOREIGN KEY (`id_Estudiante`) REFERENCES `estudiantes`(`id_Estudiante`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- =====================================================================
+-- 9. Insertar datos en la tabla de usuarios
+-- =====================================================================
+INSERT INTO `usuarios` (`usuario`, `contrasena`, `tipo_us`) VALUES
+  ('admin1', '12345', 'admin'),
+  ('admin2', '12345', 'Admin'),
+  ('docente1', '12345', 'Docente'),
+  ('docente2', '12345', 'Docente'),
+  ('docente3', '12345', 'Docente'),
+  ('estudiante1', '12345', 'Estudiante'),
+  ('estudiante2', '12345', 'Estudiante'),
+  ('estudiante3', '12345', 'Estudiante'),
+  ('estudiante4', '12345', 'Estudiante'),
+  ('estudiante5', '12345', 'Estudiante'),
+  ('estudiante6', '12345', 'Estudiante'),
+  ('estudiante7', '12345', 'Estudiante'),
+  ('estudiante8', '12345', 'Estudiante'),
+  ('estudiante9', '12345', 'Estudiante'),
+  ('estudiante10', '12345', 'Estudiante');
+
+-- =====================================================================
+-- 10. Insertar datos en la tabla de docentes
+-- =====================================================================
+INSERT INTO `docentes` (`id_User`, `nombre`, `apellidoP`, `apellidoM`, `correo`, `carrera`, `num_celular`) VALUES
+  (1, 'Bryan', 'Sanchez', 'Monroy', 'bryan@docentes.com', 'ING SISTEMAS COMPUTACIONALES', '4171122233'),
+  (2, 'Marta', 'Sanchez', 'Torres', 'marta@docentes.com', 'ING INDUSTRIAL', '4174455678'),
+  (3, 'Juan Pablo', 'Villa', 'Villagomez', 'juan@docentes.com', 'ING ELECTRONICA', '4174567898'),
+  (4, 'Sofia', 'Lopez', 'Gonzalez', 'sofia@docentes.com', 'ING SISTEMAS COMPUTACIONALES', '4171124565'),
+  (5, 'Carlos', 'Diaz', 'Perez', 'carlos@docentes.com', 'ING GESTION EMPRESARIAL', '4454578967');
+
+-- =====================================================================
+-- 11. Insertar datos en la tabla de estudiantes
+-- =====================================================================
+INSERT INTO `estudiantes` (`id_User`, `num_control`, `nombre`, `apellidoP`, `apellidoM`, `correo`, `carrera`, `semestre`, `num_celular`, `id_Docente`) VALUES
+  (6, 'S20120224', 'Jesse Santiago', 'Barrera', 'Zuñiga', 's20120224@alumnos.com', 'ING SISTEMAS COMPUTACIONALES', 7, '4171128536', 1),
+  (7, 'S20120176', 'Azucena', 'Camargo', 'Ruiz', 's20120176@alumnos.com', 'ING AMBIENTAL', 7, '4171027589', 4),
+  (8, 'S20120212', 'Jose Martin', 'García', 'Martínez', 's20120212@alumnos.com', 'ING GESTION EMPRESARIAL', 7, '4452163920', 5),
+  (9, 'S20120214', 'Pablo', 'Lopez', 'Gomez', 'pablo@alumnos.com', 'ING ELECTRONICA', 5, '4174589623', 3),
+  (10, 'S20120215', 'Carla', 'Ruiz', 'Torres', 'carla@alumnos.com', 'ING SISTEMAS COMPUTACIONALES', 6, '4174532156', 4),
+  (11, 'S20120216', 'Jose', 'Hernandez', 'Lopez', 'jose@alumnos.com', 'ING AMBIENTAL', 5, '4178753121', 5),
+  (12, 'S20120217', 'Laura', 'Gutierrez', 'Reyes', 'laura@alumnos.com', 'ING GESTION EMPRESARIAL', 6, '4453198620', 3),
+  (13, 'S20120218', 'Luis', 'Martinez', 'Vazquez', 'luis@alumnos.com', 'ING SISTEMAS COMPUTACIONALES', 8, '4176548237', 4),
+  (14, 'S20120219', 'Pedro', 'Ramirez', 'Mora', 'pedro@alumnos.com', 'ING AMBIENTAL', 9, '4173128956', 5),
+  (15, 'S20120220', 'Marcela', 'Perez', 'Moreno', 'marcela@alumnos.com', 'ING GESTION EMPRESARIAL', 4, '4171254765', 3);
+
+-- =====================================================================
+-- 12. Insertar datos en la tabla de eventos
+-- =====================================================================
+INSERT INTO `evento` (`id_Docente`, `periodo`, `nombre`, `descripcion`) VALUES
+  (3, 'AGO-DIC', 'Deletreo Master', 'Evento de deletreo entre estudiantes de ingeniería electrónica'),
+  (4, 'ENE-JUL', 'Trivia Literaria', 'Trivia basada en preguntas de lectura de libros'),
+  (5, 'ENE-JUL', 'Concurso de Dibujo', 'Concurso de dibujo de personajes del día de muertos'),
+  (3, '2025-1', 'Curso Introducción a la Programación', 'Curso básico de programación para sistemas computacionales'),
+  (4, '2025-1', 'Curso de Ecología Básica', 'Curso de fundamentos de la ecología y el medio ambiente'),
+  (5, 'AGO-JUL', 'Calaverita', 'Los estudiantes crearán una calaverita para los maestros');
+
+-- =====================================================================
+-- 13. Insertar datos en la tabla de actividades asignadas
 --
--- Volcado de datos para la tabla `tarea`
+-- Se crean actividades de ejemplo a partir de los eventos creados. Cada actividad
+-- está asociada a un docente (id_Docente) y a un evento (id_Evento).
+-- =====================================================================
+INSERT INTO `actividades_asignadas` (`id_Evento`, `fecha_ini`, `id_Docente`, `Nombre`) VALUES
+  (1, '2025-01-15', 3, 'Actividad Deletreo - Nivel 1'),
+  (2, '2025-02-01', 4, 'Trivia - Primera Ronda'),
+  (3, '2025-03-10', 5, 'Boceto Inicial'),
+  (4, '2025-01-20', 3, 'Programación - Lección 1'),
+  (5, '2025-02-10', 4, 'Ecología - Introducción'),
+  (6, '2025-04-05', 5, 'Calaverita - Creación');
+
+-- =====================================================================
+-- 14. Insertar datos en la tabla de tareas
 --
-
-INSERT INTO `tarea` (`id_Tarea`, `nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`, `Estatus`, `Anotaciones`) VALUES
-(90, 'ACT FINAL', 'ijm', 62, 's20120212', 1, ''),
-(89, 'ACT FINAL', 'JHBNJ', 62, 's20120176', 0, ''),
-(88, 'ACT FINAL', 'mnjhbvghbnj', 62, 's20120224', 0, ''),
-(91, 'N2', 'mnjhbvghbnj', 63, 's20120224', 0, ''),
-(92, 'N2', 'NUEVO', 63, 's20120176', 0, ''),
-(96, 'ACT ESTATUS', 'MK', 65, 's20120224', 0, ''),
-(97, 'ACT ESTATUS', 'KMNIM', 65, 's20120176', 0, ''),
-(98, 'ACT ESTATUS', 'NJUIJ', 65, 's20120212', 1, ''),
-(99, 'ESTADO', 'ESTADO', 66, 's20120212', 1, ''),
-(100, 'ESTADO', 'MA', 66, 's20120224', 0, '');
-
--- --------------------------------------------------------
-
+-- Las tareas se asignan a los estudiantes según el docente tutor que tienen asignado.
 --
--- Estructura de tabla para la tabla `usuarios`
---
+-- Recordatorio de asignación de estudiantes a docentes:
+--   - Docente 3: Pablo (id_Estudiante 4), Laura (id_Estudiante 7) y Marcela (id_Estudiante 10)
+--   - Docente 4: Azucena (id_Estudiante 2), Carla (id_Estudiante 5) y Luis (id_Estudiante 8)
+--   - Docente 5: Jose Martin (id_Estudiante 3), Jose (id_Estudiante 6) y Pedro (id_Estudiante 9)
+-- =====================================================================
 
-DROP TABLE IF EXISTS `usuarios`;
-CREATE TABLE IF NOT EXISTS `usuarios` (
-  `id_User` int NOT NULL AUTO_INCREMENT,
-  `usuario` varchar(100) NOT NULL,
-  `contrasena` varchar(250) NOT NULL,
-  `tipo_us` enum('Admin','Estudiante','Docente') NOT NULL,
-  PRIMARY KEY (`id_User`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- Tareas para la Actividad 1 (id_Actividades = 1, dictada por docente 3)
+INSERT INTO `tarea` (`nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`, `Estatus`, `Anotaciones`) VALUES
+  ('Tarea Deletreo Nivel 1 - Pablo', 'Realizar ejercicio de deletreo básico', 1, 4, 0, ''),
+  ('Tarea Deletreo Nivel 1 - Laura', 'Realizar ejercicio de deletreo básico', 1, 7, 0, ''),
+  ('Tarea Deletreo Nivel 1 - Marcela', 'Realizar ejercicio de deletreo básico', 1, 10, 0, '');
 
---
--- Volcado de datos para la tabla `usuarios`
---
+-- Tareas para la Actividad 2 (id_Actividades = 2, dictada por docente 4)
+INSERT INTO `tarea` (`nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`, `Estatus`, `Anotaciones`) VALUES
+  ('Tarea Trivia Ronda 1 - Azucena', 'Participar en la trivia y responder correctamente', 2, 2, 0, ''),
+  ('Tarea Trivia Ronda 1 - Carla', 'Participar en la trivia y responder correctamente', 2, 5, 0, ''),
+  ('Tarea Trivia Ronda 1 - Luis', 'Participar en la trivia y responder correctamente', 2, 8, 0, '');
 
-INSERT INTO `usuarios` (`id_User`, `usuario`, `contrasena`, `tipo_us`) VALUES
-(1, 'jesseLoco', 'eljesse', 'Admin'),
-(2, 'Jose', '12345', 'Docente'),
-(3, 'Azu', '12345', 'Docente'),
-(4, 'David', '12345', 'Docente'),
-(5, 'Sofia', '12345', 'Estudiante'),
-(6, 'Pedro', '12345', 'Estudiante'),
-(8, 'BRAYAN', '12345', 'Admin'),
-(9, 'B', '12345', 'Estudiante');
-COMMIT;
+-- Tareas para la Actividad 3 (id_Actividades = 3, dictada por docente 5)
+INSERT INTO `tarea` (`nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`, `Estatus`, `Anotaciones`) VALUES
+  ('Tarea Boceto Inicial - Jose Martin', 'Realizar el boceto inicial del concurso de dibujo', 3, 3, 0, ''),
+  ('Tarea Boceto Inicial - Jose', 'Realizar el boceto inicial del concurso de dibujo', 3, 6, 0, ''),
+  ('Tarea Boceto Inicial - Pedro', 'Realizar el boceto inicial del concurso de dibujo', 3, 9, 0, '');
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+-- Tareas para la Actividad 4 (id_Actividades = 4, dictada por docente 3)
+INSERT INTO `tarea` (`nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`, `Estatus`, `Anotaciones`) VALUES
+  ('Tarea Programación Lección 1 - Pablo', 'Completar ejercicios de introducción a la programación', 4, 4, 0, ''),
+  ('Tarea Programación Lección 1 - Laura', 'Completar ejercicios de introducción a la programación', 4, 7, 0, ''),
+  ('Tarea Programación Lección 1 - Marcela', 'Completar ejercicios de introducción a la programación', 4, 10, 0, '');
+
+-- Tareas para la Actividad 5 (id_Actividades = 5, dictada por docente 4)
+INSERT INTO `tarea` (`nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`, `Estatus`, `Anotaciones`) VALUES
+  ('Tarea Ecología Introducción - Azucena', 'Realizar lectura y resumen sobre ecología básica', 5, 2, 0, ''),
+  ('Tarea Ecología Introducción - Carla', 'Realizar lectura y resumen sobre ecología básica', 5, 5, 0, ''),
+  ('Tarea Ecología Introducción - Luis', 'Realizar lectura y resumen sobre ecología básica', 5, 8, 0, '');
+
+-- Tareas para la Actividad 6 (id_Actividades = 6, dictada por docente 5)
+INSERT INTO `tarea` (`nombre`, `descripcion`, `id_Actividad`, `id_Estudiante`, `Estatus`, `Anotaciones`) VALUES
+  ('Tarea Calaverita - Jose Martin', 'Crear una calaverita original para los maestros', 6, 3, 0, ''),
+  ('Tarea Calaverita - Jose', 'Crear una calaverita original para los maestros', 6, 6, 0, ''),
+  ('Tarea Calaverita - Pedro', 'Crear una calaverita original para los maestros', 6, 9, 0, '');
