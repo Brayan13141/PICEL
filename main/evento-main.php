@@ -36,7 +36,7 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin")) {
                 </div>
                 <div class="grid mx-auto col-md-12">
                     <?php
-                    $query = "SELECT evento.id_Evento, evento.periodo, evento.nombre AS evento_nombre, evento.descrip, docentes.nombre AS docente_nombre, docentes.apellidoP FROM evento INNER JOIN docentes ON evento.id_Docente = docentes.id_Docente";
+                    $query = "SELECT evento.id_Evento, evento.periodo, evento.nombre AS evento_nombre, evento.descripcion, docentes.nombre AS docente_nombre, docentes.apellidoP FROM evento INNER JOIN docentes ON evento.id_Docente = docentes.id_Docente";
                     echo '<table class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
                     <tr> 
                         <td><strong><p>Evento</p></strong></td>
@@ -50,7 +50,7 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin")) {
                             $id_evento = $row["id_Evento"];
                             $periodo = $row["periodo"];
                             $evento_nombre = $row["evento_nombre"];
-                            $descrip = $row["descrip"];
+                            $descrip = $row["descripcion"];
                             $docente_nombre = $row["docente_nombre"] . " " . $row["apellidoP"];
                             echo '<tr> 
                 <td>' . $evento_nombre . '</td> 

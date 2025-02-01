@@ -1,0 +1,12 @@
+# Bloquear el acceso a todos los archivos por defecto
+Require all denied
+
+# Permitir acceso a archivos PDF, imágenes y documentos
+<FilesMatch "\.(pdf|doc|docx|jpg|png)$">
+    Require all granted
+</FilesMatch>
+
+# Denegar acceso a archivos que son scripts (PHP, CGI, Perl, Python)
+<FilesMatch "\.(php|cgi|pl|py)$">
+    Require all denied
+</FilesMatch>

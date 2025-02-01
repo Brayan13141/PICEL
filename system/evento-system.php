@@ -72,7 +72,7 @@ if (
 
         if (mysqli_num_rows($complet) == 0 && is_null(isset($_SESSION['editar'])) && is_null(isset($_SESSION['idEditar']))) {
             header('Location: ../main/evento-main.php?mensaje=ENTRO AL PRIMER IF');
-            $insert = "INSERT INTO evento(id_Docente,nombre, periodo, descrip) VALUES ('$id_Doc','$nombre', '$periodo', '$descripcion')";
+            $insert = "INSERT INTO evento(id_Docente,nombre, periodo, descripcion) VALUES ('$id_Doc','$nombre', '$periodo', '$descripcion')";
             if ($link->query($insert)) {
                 header('Location: ../main/evento-main.php?mensaje=EVENTO REGISTRADO');
             } else {
@@ -80,8 +80,7 @@ if (
             }
         } else if (isset($_SESSION['editar']) && $_SESSION['editar'] == true && isset($_SESSION['idEditar'])) {
             try {
-                
-                $update = "UPDATE evento SET nombre = '$nombre', periodo = '$periodo', descrip = '$descripcion' WHERE id_Evento = " . $_SESSION['idEditar'];
+                $update = "UPDATE evento SET nombre = '$nombre', periodo = '$periodo', descripcion = '$descripcion' WHERE id_Evento = " . $_SESSION['idEditar'];
                 if ($link->query($update)) {
                     $_SESSION['editar'] = '';
                     $_SESSION['idEditar'] = '';
