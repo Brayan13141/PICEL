@@ -1,4 +1,34 @@
 <?php
+
+/**
+ * Este archivo maneja el proceso de inicio de sesión para usuarios docentes y estudiantes.
+ * 
+ * Variables principales:
+ * - $_POST['usuario']: Nombre de usuario ingresado por el usuario.
+ * - $_POST['pass']: Contraseña ingresada por el usuario.
+ * - $keyend: Clave codificada en base64 utilizada en el proceso.
+ * - $usuario: Nombre de usuario después de aplicar la función antiscript.
+ * - $pass: Contraseña después de aplicar la función antiscript.
+ * - $usenc: Nombre de usuario codificado en hexadecimal.
+ * - $sql: Consulta SQL para verificar los datos del usuario docente.
+ * - $sql2: Consulta SQL para verificar los datos del usuario estudiante.
+ * - $complet: Resultado de la consulta SQL para docentes.
+ * - $complet2: Resultado de la consulta SQL para estudiantes.
+ * - $error3: Mensaje de error codificado en base64 para datos incorrectos.
+ * - $error2: Mensaje de error codificado en base64 para campos vacíos.
+ * 
+ * Funciones principales:
+ * - antiscript($data): Función que limpia los datos de entrada para prevenir ataques XSS.
+ * 
+ * Flujo principal:
+ * 1. Verifica si los campos 'usuario' y 'pass' están establecidos y no están vacíos.
+ * 2. Limpia los datos de entrada utilizando la función antiscript.
+ * 3. Codifica el nombre de usuario en hexadecimal.
+ * 4. Ejecuta consultas SQL para verificar si el usuario es un docente o un estudiante.
+ * 5. Si las credenciales son correctas, inicia una sesión y redirige al usuario a la página principal.
+ * 6. Si las credenciales son incorrectas, redirige al usuario a la página de inicio con un mensaje de error.
+ * 7. Si los campos están vacíos, redirige al usuario a la página de inicio con un mensaje de error.
+ */
 include("conexion.php");
 function antiscript($data)
 {
