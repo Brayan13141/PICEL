@@ -1,4 +1,27 @@
 <?php
+
+/**
+ * Archivo: /c:/wamp64/www/PICEL-master/PICEL-master/system/evento-system.php
+ *
+ * Este archivo maneja las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para los eventos en el sistema.
+ *
+ * Variables principales:
+ * - $link: Conexión a la base de datos.
+ * - $_SESSION['editar']: Indica si se está en modo de edición.
+ * - $_SESSION['idEditar']: Almacena el ID del evento que se está editando.
+ * - $_SESSION['id_User']: ID del usuario actual.
+ *
+ * Funciones principales:
+ * - antiscript($data): Limpia los datos de entrada para prevenir ataques XSS.
+ *
+ * Operaciones principales:
+ * - Cancelar actualización: Si se recibe una solicitud de cancelación, se restablecen las variables de sesión y se redirige a la página principal de eventos.
+ * - Actualizar o eliminar: Dependiendo de la acción recibida (eliminar_registro o editar_registro), se elimina un evento o se prepara para editarlo.
+ * - Insertar o actualizar: Si se reciben los datos necesarios (nombre, periodo, descripcion), se inserta un nuevo evento o se actualiza uno existente.
+ *
+ * Manejo de errores:
+ * - Se utilizan bloques try-catch para manejar excepciones y redirigir con mensajes de error en caso de fallos.
+ */
 include("../system/conexion.php");
 session_start();
 
@@ -68,10 +91,9 @@ if (
         $sql1 = "SELECT id_Docente FROM docentes WHERE id_User = '$id_User'";
         $complet2 = $link->query($sql1);
         $row = $complet2->fetch_assoc();
-        $id_Doc = $row["id_Docente"]; 
+        $id_Doc = $row["id_Docente"];
 
         if (mysqli_num_rows($complet) == 0 && is_null(isset($_SESSION['editar'])) && is_null(isset($_SESSION['idEditar']))) {
-            header('Location: ../main/evento-main.php?mensaje=ENTRO AL PRIMER IF');
             $insert = "INSERT INTO evento(id_Docente,nombre, periodo, descripcion) VALUES ('$id_Doc','$nombre', '$periodo', '$descripcion')";
             if ($link->query($insert)) {
                 header('Location: ../main/evento-main.php?mensaje=EVENTO REGISTRADO');

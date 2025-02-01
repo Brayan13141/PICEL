@@ -1,5 +1,27 @@
- 
 <?php
+
+/**
+ * Este archivo maneja las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para la entidad "docentes".
+ *
+ * Variables principales:
+ * - $link: Conexión a la base de datos.
+ * - $_SESSION: Variables de sesión para manejar el estado de edición.
+ * - $_POST: Datos enviados a través del formulario.
+ *
+ * Funciones principales:
+ * - antiscript($data): Limpia los datos de entrada para prevenir ataques XSS.
+ *
+ * Operaciones:
+ * - Cancelar edición: Si se recibe el parámetro 'cancel', se reinician las variables de sesión y se redirige a la página principal.
+ * - Eliminar registro: Si se recibe la acción 'eliminar_registro', se elimina el docente correspondiente de la base de datos.
+ * - Editar registro: Si se recibe la acción 'editar_registro', se obtiene la información del docente y se guarda en la sesión.
+ * - Crear o actualizar registro: Si se reciben todos los datos necesarios, se crea un nuevo docente o se actualiza uno existente.
+ *
+ * Validaciones:
+ * - Se valida que todos los campos requeridos estén presentes y no vacíos.
+ * - Se previene la duplicación de registros de docentes.
+ * - Se manejan excepciones y se redirige con mensajes de error en caso de fallos.
+ */
 include("../system/conexion.php");
 session_start();
 
@@ -140,7 +162,7 @@ if (
     if (
         isset($_POST['accion'])  && isset($_POST['id_registro']) &&
         (isset($_POST['accion']) == "eliminar_registro" || isset($_POST['accion']) == "editar_registro")
-        
+
     ) {
         //NO SE REALIZA NADA
     } else {

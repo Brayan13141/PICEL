@@ -1,4 +1,45 @@
 <?php
+
+/**
+ * Archivo: /c:/wamp64/www/PICEL-master/PICEL-master/main/evento-main.php
+ *
+ * Este archivo maneja la interfaz principal para la gestión de eventos en el sistema PICEL.
+ *
+ * Requisitos:
+ * - Debe existir una sesión iniciada con un usuario de tipo "Admin".
+ * - Se requiere la conexión a la base de datos a través del archivo '../system/conexion.php'.
+ * - Se incluyen varios archivos CSS y JS para el diseño y funcionalidad de la página.
+ * - Se requiere el archivo 'menu.php' para mostrar el menú de navegación.
+ * - Se requiere el archivo 'footer.php' para mostrar el pie de página.
+ *
+ * Variables principales:
+ * - $_SESSION['id_User']: ID del usuario que ha iniciado sesión.
+ * - $_SESSION['tipo_us']: Tipo de usuario que ha iniciado sesión.
+ * - $_SESSION['editar']: Variable de sesión para manejar la edición de eventos.
+ * - $_SESSION['idEditar']: ID del evento que se está editando.
+ * - $link: Conexión a la base de datos.
+ * - $query: Consulta SQL para obtener los eventos y sus detalles.
+ * - $result: Resultado de la consulta SQL.
+ * - $row: Fila actual del resultado de la consulta SQL.
+ * - $id_evento: ID del evento.
+ * - $periodo: Periodo del evento.
+ * - $evento_nombre: Nombre del evento.
+ * - $descrip: Descripción del evento.
+ * - $docente_nombre: Nombre del docente asociado al evento.
+ *
+ * Funciones JavaScript:
+ * - load(id): Muestra u oculta las secciones de registros y registro de eventos según el valor de 'id'.
+ * - editarEvento(id_evento): Función para editar un evento (definida en 'evento-main.js').
+ * - modal(id_evento, nombre_evento): Muestra el modal de confirmación de eliminación de un evento.
+ * - cancel(): Cancela la acción de registro de un evento.
+ *
+ * Modales:
+ * - deleteModal: Modal para confirmar la eliminación de un evento.
+ * - ModalMensaje: Modal para mostrar mensajes al usuario.
+ *
+ * Redirección:
+ * - Si el usuario no tiene una sesión válida o no es un administrador, se redirige a '../main/index.php'.
+ */
 session_start();
 if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin")) {
     include('../system/conexion.php');
@@ -27,8 +68,10 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin")) {
         ?>
         <div class="container margen">
             <div class="row mt-3">
-                <div class="col"><button type="button" onclick="load(0);" class="mx-auto d-flex justify-content-center btn btn-success">Ver Registros</button></div>
-                <div class="col"><button type="button" onclick="load(1);" class="mx-auto d-flex justify-content-center btn btn-success">Registrar Evento</button></div>
+                <div class="col"><button type="button" onclick="load(0);"
+                        class="mx-auto d-flex justify-content-center btn btn-success">Ver Registros</button></div>
+                <div class="col"><button type="button" onclick="load(1);"
+                        class="mx-auto d-flex justify-content-center btn btn-success">Registrar Evento</button></div>
             </div>
             <div class="row" style="display:none;visibility:hidden;" id="registros">
                 <div class="col-12 pt-2 text-center">
@@ -36,7 +79,9 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin")) {
                 </div>
                 <div class="grid mx-auto col-md-12">
                     <?php
-                    $query = "SELECT evento.id_Evento, evento.periodo, evento.nombre AS evento_nombre, evento.descripcion, docentes.nombre AS docente_nombre, docentes.apellidoP FROM evento INNER JOIN docentes ON evento.id_Docente = docentes.id_Docente";
+                    $query = "SELECT evento.id_Evento, evento.periodo, evento.nombre AS evento_nombre, evento.descripcion, docentes.nombre 
+                     AS docente_nombre, docentes.apellidoP FROM evento INNER JOIN docentes 
+                     ON evento.id_Docente = docentes.id_Docente";
                     echo '<table class="table table-hover mt-3" border="0" cellspacing="2" cellpadding="2"> 
                     <tr> 
                         <td><strong><p>Evento</p></strong></td>
@@ -185,7 +230,7 @@ if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin")) {
 
     </html>
 <?php
-}else{
+} else {
     header('Location: ../main/index.php');
 }
 ?>
