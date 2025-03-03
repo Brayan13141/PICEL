@@ -1,4 +1,40 @@
 <?php
+
+/**
+ * Archivo: /c:/wamp64/www/PICEL-master/PICEL-master/main/Actividades-Alumnos.php
+ *
+ * Este archivo muestra las actividades asignadas a los alumnos.
+ * Requiere que el usuario haya iniciado sesión y tenga los permisos adecuados.
+ *
+ * Variables principales:
+ * - $_SESSION['tipo_us']: Tipo de usuario (Admin, Docente, etc.)
+ * - $_SESSION['id_User']: ID del usuario
+ * - $_SESSION['num_control']: Número de control del estudiante
+ * - $link: Conexión a la base de datos
+ * - $query: Consulta SQL para obtener las actividades asignadas
+ * - $result: Resultado de la consulta SQL
+ * - $row: Fila actual de los resultados de la consulta
+ * - $id_tarea: ID de la tarea
+ * - $nombreTarea: Nombre de la tarea
+ * - $descripcion: Descripción de la tarea
+ * - $nombreDocente: Nombre completo del docente
+ * - $estatus: Estado de la tarea (0: Pendiente, 1: Entregado)
+ * - $anotaciones: Anotaciones de la tarea
+ * - $estatusBadge: Etiqueta HTML que muestra el estado de la tarea
+ * - $Archivo: HTML para el archivo de la tarea
+ *
+ * Archivos requeridos:
+ * - ../system/conexion.php: Archivo para la conexión a la base de datos
+ * - menu.php: Archivo que contiene el menú de navegación
+ * - footer.php: Archivo que contiene el pie de página
+ * - ../css/bootstrap.min.css: Archivo CSS de Bootstrap
+ * - ../css/estilo.css: Archivo CSS personalizado
+ * - ../js/jquery-3.6.0.min.js: Archivo JavaScript de jQuery
+ * - ../js/bootstrap.min.js: Archivo JavaScript de Bootstrap
+ * - ../main/CSS/Actividades-Alumno.css: Archivo CSS específico para esta página
+ * - https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css: Archivo CSS de iconos de Bootstrap
+ * - https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css: Archivo CSS de Bootstrap
+ * - https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js: Archivo JavaScript de Bootstrap*/
 session_start();
 if (isset($_SESSION['tipo_us']) && isset($_SESSION['id_User'])) {
     include('../system/conexion.php');
