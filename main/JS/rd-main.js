@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-
     document.getElementById('frm-rd').addEventListener('submit', function () {
         event.preventDefault(); // Prevent form submission
         if (validarFormulario()) {
@@ -7,10 +6,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-
-    document.getElementById('confirmDelete').addEventListener('click', function () {
-        eliminarDocente(idDocente);
-    });
+    document
+        .getElementById('confirmDelete')
+        .addEventListener('click', function () {
+            eliminarDocente(idDocente);
+        });
 });
 //--------------------------VISTA-----------------------------------------
 let idDocente;
@@ -19,52 +19,58 @@ function modal(id, Nombre) {
     document.getElementById('Nombre-Modal').innerText = Nombre;
     idDocente = id;
 }
+
 //---------------------------FUNCIONALIDAD-----------------------------------------
 function load(id) {
     if (id == 0) {
-        document.getElementById("registros").style = "display:block;visibility:visible;";
-        document.getElementById("registrar").style = "display:none;visibility:hidden;";
+        document.getElementById('registros').style =
+            'display:block;visibility:visible;';
+        document.getElementById('registrar').style =
+            'display:none;visibility:hidden;';
     } else {
-        $('#nombre-c').val("");
-        $('#apellidoP-c').val("");
-        $('#apellidoM-c').val("");
-        $('#carrera-c').val("");
-        $('#correo-c').val("");
-        $('#telefono-c').val("");
-        $('#usuario-c').val("");
-        $('#password-c').val("");
-        document.getElementById("registrar").style = "display:block;visibility:visible;";
-        document.getElementById("registros").style = "display:none;visibility:hidden;";
+        $('#nombre-c').val('');
+        $('#apellidoP-c').val('');
+        $('#apellidoM-c').val('');
+        $('#carrera-c').val('');
+        $('#correo-c').val('');
+        $('#telefono-c').val('');
+        $('#usuario-c').val('');
+        $('#password-c').val('');
+        document.getElementById('registrar').style =
+            'display:block;visibility:visible;';
+        document.getElementById('registros').style =
+            'display:none;visibility:hidden;';
     }
 }
 function eliminarDocente(idRegistro) {
     // Eliminar el registro con ID "idRegistro" de la base de datos
     try {
         $.ajax({
-            url: "../system/sm_rd.php",
-            type: "POST",
+            url: '../system/sm_rd.php',
+            type: 'POST',
             data: {
-                accion: "eliminar_registro",
-                id_registro: parseInt(idRegistro)
+                accion: 'eliminar_registro',
+                id_registro: parseInt(idRegistro),
             },
             success: function (respuesta) {
-                window.location.href = "./rd-main.php?mensaje=SE ELIMINO CORRECTAMENTE";
-            }
+                window.location.href =
+                    './rd-main.php?mensaje=SE ELIMINO CORRECTAMENTE';
+            },
         });
     } catch (e) {
-        window.location.href = "./rd-main.php?mensaje=Error al eliminar el registro" + e;
-        
+        window.location.href =
+            './rd-main.php?mensaje=Error al eliminar el registro' + e;
     }
 }
 
 function editarDocente(idRegistro) {
     try {
         $.ajax({
-            url: "../system/sm_rd.php",
-            type: "POST",
+            url: '../system/sm_rd.php',
+            type: 'POST',
             data: {
-                accion: "editar_registro",
-                id_registro: parseInt(idRegistro)
+                accion: 'editar_registro',
+                id_registro: parseInt(idRegistro),
             },
             success: function (respuesta) {
                 var datos = JSON.parse(respuesta);
@@ -77,32 +83,32 @@ function editarDocente(idRegistro) {
                 $('#correo-c').val(docente.correo);
                 $('#telefono-c').val(docente.num_celular);
                 $('#usuario-c').val(docente.usuario);
-                $('#password-c').val(docente.contrasena); 
+                $('#password-c').val(docente.contrasena);
                 $('#btn-regis').text('Aceptar');
-            }
+            },
         });
     } catch (e) {
-        window.location.replace('../main/rd-main.php?mensaje=ERROR AL EDITAR EL DOCENTE:' + e);
-
+        window.location.replace(
+            '../main/rd-main.php?mensaje=ERROR AL EDITAR EL DOCENTE:' + e
+        );
     }
 }
 
 function cancel() {
     try {
         $.ajax({
-            url: "../system/sm_rd.php",
-            type: "POST",
+            url: '../system/sm_rd.php',
+            type: 'POST',
             data: {
-                cancel: true
+                cancel: true,
             },
             success: function (respuesta) {
                 location.href = 'rd-main.php';
-            }
+            },
         });
     } catch (e) {
-        alert("Error" + e);
+        alert('Error' + e);
     }
-    
 }
 //---------------------------------VALIDACIONES----------------------------
 // Validaciones del formulario
@@ -117,42 +123,58 @@ function validarFormulario() {
     var password = document.getElementById('password-c').value;
 
     if (nombre.trim() === '') {
-        window.location.replace('../main/rd-main.php?mensaje=POR FAVOR INGRESE UN NOMBRE VALIDO');
+        window.location.replace(
+            '../main/rd-main.php?mensaje=POR FAVOR INGRESE UN NOMBRE VALIDO'
+        );
         return false;
     }
 
     if (apellidoP.trim() === '') {
-        window.location.replace('../main/rd-main.php?mensaje=POR FAVOR INGRESE UN APELLIDO PATERNO VALIDO');
+        window.location.replace(
+            '../main/rd-main.php?mensaje=POR FAVOR INGRESE UN APELLIDO PATERNO VALIDO'
+        );
         return false;
     }
 
     if (apellidoM.trim() === '') {
-        window.location.replace('../main/rd-main.php?mensaje=POR FAVOR INGRESE UN APELLIDO MATERNO VALIDO');
+        window.location.replace(
+            '../main/rd-main.php?mensaje=POR FAVOR INGRESE UN APELLIDO MATERNO VALIDO'
+        );
         return false;
     }
 
     if (carrera.trim() === '') {
-        window.location.replace('../main/rd-main.php?mensaje=POR FAVOR INGRESE UNA CARRERA VALIDA');
+        window.location.replace(
+            '../main/rd-main.php?mensaje=POR FAVOR INGRESE UNA CARRERA VALIDA'
+        );
         return false;
     }
 
     if (correo.trim() === '') {
-        window.location.replace('../main/rd-main.php?mensaje=POR FAVOR INGRESE UN CORREO VALIDO');
+        window.location.replace(
+            '../main/rd-main.php?mensaje=POR FAVOR INGRESE UN CORREO VALIDO'
+        );
         return false;
     }
 
     if (telefono.trim() === '') {
-        window.location.replace('../main/rd-main.php?mensaje=POR FAVOR INGRESE UN NUMERO DE TELEFONO VALIDO');
+        window.location.replace(
+            '../main/rd-main.php?mensaje=POR FAVOR INGRESE UN NUMERO DE TELEFONO VALIDO'
+        );
         return false;
     }
 
     if (usuario.trim() === '') {
-        window.location.replace('../main/rd-main.php?mensaje=POR FAVOR INGRESE UN NOMBRE DE USUARIO VALIDO');
+        window.location.replace(
+            '../main/rd-main.php?mensaje=POR FAVOR INGRESE UN NOMBRE DE USUARIO VALIDO'
+        );
         return false;
     }
 
     if (password.trim() === '') {
-        window.location.replace('../main/rd-main.php?mensaje=POR FAVOR INGRESE UNA CONTRASEÑA VALIDA');
+        window.location.replace(
+            '../main/rd-main.php?mensaje=POR FAVOR INGRESE UNA CONTRASEÑA VALIDA'
+        );
         return false;
     }
 

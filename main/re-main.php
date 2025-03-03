@@ -39,9 +39,11 @@
  * - Si el usuario no es Admin o Docente, se redirige a index.php.
  */
 session_start();
-if (isset($_SESSION['tipo_us']) != "Admin") {
-    header("Location: index.php");
+if (!isset($_SESSION['tipo_us']) || ($_SESSION['tipo_us'] != "Admin" && $_SESSION['tipo_us'] != "Docente")) {
+    header('Location: ../main/index.php');
+    exit();
 }
+
 if ((isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin") ||
     (isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Docente")
 ) {

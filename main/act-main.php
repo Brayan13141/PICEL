@@ -185,8 +185,8 @@ if (isset($_SESSION['id_User'])) {
                                             <td>
                                             <button type="button" onclick="enviarDatos(' . $id_Evento . ',' . $row_d0[4] . ',' . $row_d0[5] . ');" 
                                             class="mx-auto btn btn-success">DETALLES</button>
-                                           <button class="mx-auto btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                                            onclick="modal(' . $row_d0[5] . ',\'' . $row_d0[0] . '\')">ELIMINAR</button>
+                                            <button class="mx-auto btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                            onclick="modal(' . $row_d0[5] . ',\'' . $row_d0[1] . '\')">ELIMINAR</button>
                                             </td>
                                             </tr>';
                                     }
@@ -280,7 +280,7 @@ if (isset($_SESSION['id_User'])) {
                                             <td>
                                             <button type="button" onclick="enviarDatos(' . $id_Evento . ',' . $row_d0[4] . ',' . $row_d0[5] . ');" 
                                             class="mx-auto btn btn-success">DETALLES</button>
-                                            <button  class="mx-auto btn btn-danger">ELIMINAR</button>
+                                            <button  class="mx-auto btn btn-danger" onclick="modal(' . $row_d0[5] . ',' . ' \'' . addslashes($row_d0[1]) . '\')">ELIMINAR</button>
                                             </td>
                                             </tr>';
                                     }
@@ -300,7 +300,7 @@ if (isset($_SESSION['id_User'])) {
                     <h2>Definición de Actividades</h2>
                 </div>
                 <div class="grid mx-auto col-md-8" style="--bs-columns: 2;">
-                    <form method="POST" id="frm_act" action="../system/sm-activity.php?caso=1" novalidate>
+                    <form method="POST" id="frm_act" action="../system/act-main.php" novalidate>
                         <div class="row">
                             <div class="col-12 pt-2 text-center">
                                 <h3>Nombre de la actividad</h3>
@@ -342,6 +342,7 @@ if (isset($_SESSION['id_User'])) {
                                         while ($row2 = $result2->fetch_assoc()) {
                                             $Estudiante = $row2["num_control"];
                                             $id = $row2["id_Estudiante"];
+
                                             $opciones .= '<option  value="'  . $Estudiante . '">' . $Estudiante . '</option>';
                                         }
                                         $result2->free();
@@ -401,7 +402,7 @@ if (isset($_SESSION['id_User'])) {
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             style="border: 1px solid black;">Cancelar</button>
                         <button type="button" class="btn btn-danger" id="confirmDelete"
-                            style="border: 1px solid black;">Eliminar</button>
+                            style="border: 1px solid black; ">Eliminar</button>
                     </div>
                 </div>
             </div>
