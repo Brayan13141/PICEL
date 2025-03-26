@@ -1,6 +1,7 @@
 -- =====================================================================
 -- 1. Eliminar tablas y base de datos si existen
 -- =====================================================================
+DROP TABLE IF EXISTS `entregas`;
 DROP TABLE IF EXISTS `tarea`;
 DROP TABLE IF EXISTS `actividades_asignadas`;
 DROP TABLE IF EXISTS `evento`;
@@ -20,10 +21,10 @@ USE PICEL3;
 -- 3. Crear tabla de usuarios
 -- =====================================================================
 CREATE TABLE `usuarios` (
-  `id_User` int NOT NULL AUTO_INCREMENT,
-  `usuario` varchar(100) NOT NULL,
-  `contrasena` varchar(250) NOT NULL,
-  `tipo_us` enum('Admin','Estudiante','Docente') NOT NULL,
+  `id_User` INT NOT NULL AUTO_INCREMENT,
+  `usuario` VARCHAR(100) NOT NULL UNIQUE,
+  `contrasena` VARCHAR(250) NOT NULL,
+  `tipo_us` ENUM('Admin','Estudiante','Docente') NOT NULL,
   PRIMARY KEY (`id_User`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -31,14 +32,14 @@ CREATE TABLE `usuarios` (
 -- 4. Crear tabla de docentes
 -- =====================================================================
 CREATE TABLE `docentes` (
-  `id_Docente` int NOT NULL AUTO_INCREMENT,
-  `id_User` int DEFAULT NULL,
-  `nombre` varchar(50) NOT NULL,
-  `apellidoP` varchar(50) NOT NULL,
-  `apellidoM` varchar(50) NOT NULL,
-  `correo` varchar(50) NOT NULL,
-  `carrera` varchar(35) NOT NULL,
-  `num_celular` char(10) NOT NULL,
+  `id_Docente` INT NOT NULL AUTO_INCREMENT,
+  `id_User` INT DEFAULT NULL,
+  `nombre` VARCHAR(50) NOT NULL,
+  `apellidoP` VARCHAR(50) NOT NULL,
+  `apellidoM` VARCHAR(50) NOT NULL,
+  `correo` VARCHAR(50) NOT NULL UNIQUE,
+  `carrera` VARCHAR(35) NOT NULL,
+  `num_celular` CHAR(10) NOT NULL,
   PRIMARY KEY (`id_Docente`),
   FOREIGN KEY (`id_User`) REFERENCES `usuarios`(`id_User`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -47,17 +48,17 @@ CREATE TABLE `docentes` (
 -- 5. Crear tabla de estudiantes
 -- =====================================================================
 CREATE TABLE `estudiantes` (
-  `id_Estudiante` int NOT NULL AUTO_INCREMENT,
-  `id_User` int DEFAULT NULL,
-  `num_control` char(9) NOT NULL,
-  `nombre` varchar(50) NOT NULL,
-  `apellidoP` varchar(50) NOT NULL,
-  `apellidoM` varchar(50) NOT NULL,
-  `correo` varchar(50) NOT NULL,
-  `carrera` varchar(50) NOT NULL,
-  `semestre` int NOT NULL,
-  `num_celular` char(10) NOT NULL,
-  `id_Docente` int NOT NULL,
+  `id_Estudiante` INT NOT NULL AUTO_INCREMENT,
+  `id_User` INT DEFAULT NULL,
+  `num_control` CHAR(9) NOT NULL UNIQUE,
+  `nombre` VARCHAR(50) NOT NULL,
+  `apellidoP` VARCHAR(50) NOT NULL,
+  `apellidoM` VARCHAR(50) NOT NULL,
+  `correo` VARCHAR(50) NOT NULL UNIQUE,
+  `carrera` VARCHAR(50) NOT NULL,
+  `semestre` INT NOT NULL,
+  `num_celular` CHAR(10) NOT NULL,
+  `id_Docente` INT NOT NULL,
   PRIMARY KEY (`id_Estudiante`),
   FOREIGN KEY (`id_User`) REFERENCES `usuarios`(`id_User`) ON DELETE SET NULL,
   FOREIGN KEY (`id_Docente`) REFERENCES `docentes`(`id_Docente`) ON DELETE CASCADE
@@ -67,11 +68,11 @@ CREATE TABLE `estudiantes` (
 -- 6. Crear tabla de eventos
 -- =====================================================================
 CREATE TABLE `evento` (
-  `id_Evento` int NOT NULL AUTO_INCREMENT,
-  `id_Docente` int NOT NULL,
-  `periodo` varchar(50) NOT NULL,
-  `nombre` text NOT NULL,
-  `descripcion` text,
+  `id_Evento` INT NOT NULL AUTO_INCREMENT,
+  `id_Docente` INT NOT NULL,
+  `periodo` VARCHAR(50) NOT NULL,
+  `nombre` TEXT NOT NULL,
+  `descripcion` TEXT,
   PRIMARY KEY (`id_Evento`),
   FOREIGN KEY (`id_Docente`) REFERENCES `docentes`(`id_Docente`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -80,11 +81,11 @@ CREATE TABLE `evento` (
 -- 7. Crear tabla de actividades asignadas
 -- =====================================================================
 CREATE TABLE `actividades_asignadas` (
-  `id_Actividades` int NOT NULL AUTO_INCREMENT,
-  `id_Evento` int NOT NULL,
-  `fecha_ini` varchar(30) NOT NULL,
-  `id_Docente` int NOT NULL,
-  `Nombre` varchar(100) NOT NULL,
+  `id_Actividades` INT NOT NULL AUTO_INCREMENT,
+  `id_Evento` INT NOT NULL,
+  `fecha_ini` VARCHAR(30) NOT NULL,
+  `id_Docente` INT NOT NULL,
+  `Nombre` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`id_Actividades`),
   FOREIGN KEY (`id_Evento`) REFERENCES `evento`(`id_Evento`) ON DELETE CASCADE,
   FOREIGN KEY (`id_Docente`) REFERENCES `docentes`(`id_Docente`) ON DELETE CASCADE
@@ -94,17 +95,30 @@ CREATE TABLE `actividades_asignadas` (
 -- 8. Crear tabla de tareas
 -- =====================================================================
 CREATE TABLE `tarea` (
-  `id_Tarea` int NOT NULL AUTO_INCREMENT,
-  `nombre` text NOT NULL,
-  `descripcion` text,
-  `id_Actividad` int NOT NULL,
-  `id_Estudiante` int NOT NULL,
-  `Estatus` tinyint(1) NOT NULL,
-  `Anotaciones` varchar(300) NOT NULL,
+  `id_Tarea` INT NOT NULL AUTO_INCREMENT,
+  `nombre` TEXT NOT NULL,
+  `descripcion` TEXT,
+  `id_Actividad` INT NOT NULL,
+  `id_Estudiante` INT NOT NULL,
+  `Estatus` TINYINT(1) NOT NULL DEFAULT 0,
+  `Anotaciones` VARCHAR(300) NOT NULL,
   PRIMARY KEY (`id_Tarea`),
   FOREIGN KEY (`id_Actividad`) REFERENCES `actividades_asignadas`(`id_Actividades`) ON DELETE CASCADE,
   FOREIGN KEY (`id_Estudiante`) REFERENCES `estudiantes`(`id_Estudiante`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =====================================================================
+-- 9. Crear tabla de entregas
+-- =====================================================================
+CREATE TABLE `entregas` (
+  `id_Entrega` INT NOT NULL AUTO_INCREMENT,
+  `id_Tarea` INT NOT NULL,
+  `archivo` VARCHAR(255) NOT NULL,  -- Ruta o nombre del archivo entregado
+  `fecha_entrega` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_Entrega`),
+  FOREIGN KEY (`id_Tarea`) REFERENCES `tarea`(`id_Tarea`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 -- =====================================================================
 -- 9. Insertar datos en la tabla de usuarios
