@@ -35,13 +35,12 @@ if ($_SESSION['id_User']) {
     <html lang="en">
 
     <head>
-        <title>PICEL ~ MAIN</title>
+        <title>PANEL PRINCIPAL</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" href="../ico/logo.ico">
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/estilo.css?v=<?php echo time(); ?>" rel="stylesheet">
-        <!--<script src="https://kit.fontawesome.com/2a6b22e937.js" crossorigin="anonymous"></script>-->
         <script src="../js/2a6b22e937.js" crossorigin="anonymous"></script>
 
     </head>
