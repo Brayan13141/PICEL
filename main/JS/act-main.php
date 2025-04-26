@@ -1,221 +1,215 @@
- <?php
-    if (session_status() == PHP_SESSION_ACTIVE) {
-    } else {
-        session_start();
+<?php
+if (session_status() == PHP_SESSION_ACTIVE) {
+} else {
+    session_start();
+}
+if (isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin" || $_SESSION['tipo_us'] == "Docente") {
+?>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const formulario = document.getElementById('frm_act');
+    const selectNoAlumnos = document.getElementById("noAlumnos");
+
+    // 1) Validación del formulario al enviarse
+    formulario.addEventListener('submit', e => {
+        e.preventDefault();
+        if (validarFormulario()) {
+            formulario.submit();
+        }
+    });
+
+    // 2) Al cambiar el número de alumnos, reconstruimos los campos
+    selectNoAlumnos.addEventListener('change', () => {
+        const limite = parseInt(selectNoAlumnos.value, 10);
+        actualizarCampos(limite);
+    });
+
+    // 3) Si al cargar ya había un valor, generamos campos
+    if (selectNoAlumnos.value) {
+        actualizarCampos(parseInt(selectNoAlumnos.value, 10));
     }
-    if (isset($_SESSION['id_User']) && $_SESSION['tipo_us'] == "Admin" || $_SESSION['tipo_us'] == "Docente") {
-    ?>
-     <script>
-         let OpcionesGlobales;
-         let OpcionesTemporales;
-         document.addEventListener("DOMContentLoaded", () => {
-             document.getElementById("noAlumnos").value = "";
-             const formulario = document.getElementById('frm_act');
-             //----------------------- VALIDAR FORMULARIO
-             document.getElementById('frm_act').addEventListener('submit', (e) => {
-                 e.preventDefault(); // Prevent form submission
-                 if (validarFormulario()) {
-                     formulario.submit();
-                 }
-             });
 
+    // 4) Configuración del botón de eliminación en el modal
+    document.getElementById("confirmDelete").addEventListener("click", () => {
+        eliminarAct(idAct);
+    });
+});
 
+// Variable global para la actividad a eliminar
+let idAct = null;
 
-             //------------------------INICIALIZAR EL CONTADOR Y AÑADIR LOS EVENTOS ----------------
-             var contenedor = document.getElementById('contenedorAlumnos');
+// Función para lanzar la petición AJAX de eliminación
+function eliminarAct(idRegistro) {
+    $.post("../system/act-main.php", {
+            accion: "eliminar_registro",
+            id_registro: parseInt(idRegistro, 10)
+        })
+        .done(res => {
+            window.location.href = "../main/act-main.php?mensaje=SE ELIMINÓ CORRECTAMENTE";
+        })
+        .fail(err => {
+            window.location.href = "../main/act-main.php?mensaje=ERROR AL ELIMINAR EL REGISTRO";
+        });
+}
 
-             document.getElementById("noAlumnos").addEventListener('change',
-                 () => {
-                     limite = document.getElementById("noAlumnos").value;
-                     contenedor.innerHTML = '';
-                     OpcionesGlobales = {};
-                     OpcionesTemporales = {};
-                     actualizarCampos(limite);
-                 });
+// Función para enviar datos a la vista de detalles
+function enviarDatos(idEvento, id_Docente, id_actividad) {
+    window.location.href =
+        `../main/mact-main.php?id_E=${idEvento}&id_D=${id_Docente}&id_A=${id_actividad}`;
+}
 
-             document.getElementById("confirmDelete").addEventListener("click", function() {
-                 eliminarAct(idAct);
-             });
+// Mostrar modal de confirmación
+function modal(id, Nombre) {
+    document.getElementById("Nombre-Modal").innerText = Nombre;
+    idAct = id;
+    new bootstrap.Modal(document.getElementById("deleteModal")).show();
+}
 
-         });
-         let idAct;
+// Alternar vistas Registros / Definir
+function load(id) {
+    document.getElementById("registros").style = id === 0 ?
+        "display:block;visibility:visible;" :
+        "display:none;visibility:hidden;";
+    document.getElementById("definir").style = id === 1 ?
+        "display:block;visibility:visible;" :
+        "display:none;visibility:hidden;";
+}
 
-         function eliminarAct(idRegistro) {
-             // Eliminar el registro con ID "idRegistro" de la base de datos
-             try {
-                 $.ajax({
-                     url: "../system/act-main.php",
-                     type: "POST",
-                     data: {
-                         accion: "eliminar_registro",
-                         id_registro: parseInt(idRegistro),
-                     },
-                     success: function(respuesta) {
+// Array maestro de opciones (se llena cada vez)
+let opcionesArr = [];
 
-                         window.location.href = "../main/act-main.php?mensaje=SE ELIMINO CORRECTAMENTE";
-                     },
-                 });
-             } catch (e) {
-                 window.location.href =
-                     "./act-main.php?mensaje=ERROR AL ELIMINAR EL REGISTRO" + e;
-             }
-         }
+/**
+ * Genera dinámicamente los campos "Estudiante i" y "Descripción de la tarea i"
+ * según el límite seleccionado en #noAlumnos.
+ * Además, recarga las opciones de alumno para que no se repitan.
+ * 
+ */
+function actualizarCampos(limite) {
+    // 1) Limpia todo el contenedor antes de volver a poblarlo
+    const contenedor = document.getElementById('contenedorAlumnos');
+    contenedor.innerHTML = '';
 
+    // 2) Parseamos las <option> inyectadas desde PHP en SESSION
+    const temp = document.createElement('div');
+    temp.innerHTML = `<?php echo $_SESSION['opciones'] ?>`;
+    // Creamos un array de objetos con { value, text } para cada alumno
+    const opcionesArr = Array.from(
+        temp.querySelectorAll('option')
+    ).map(opt => ({
+        value: opt.value, // num_control
+        text: opt.textContent // "Nombre – num_control"
+    }));
 
-         function enviarDatos(idEvento, id_Docente, id_actividad) {
-             // Construimos la URL con los parámetros que queremos enviar 
-             var url = "../main/mact-main.php?id_E=" + idEvento + "&id_D=" + id_Docente + "&id_A=" + id_actividad;
+    // 3) Por cada índice 1..limite, creamos la fila de inputs
+    for (let i = 1; i <= limite; i++) {
+        // Fila contenedora
+        const row = document.createElement('div');
+        row.className = 'row mb-3';
+        row.id = `campoAlumno${i}`;
 
-             // Redireccionamos a la página con la URL generada
-             window.location.href = url;
-         }
+        // === Columna 1: Select de alumno ===
+        const col1 = document.createElement('div');
+        col1.className = 'mb-3 col-6';
 
-         function modal(id, Nombre) {
-             document.getElementById("Nombre-Modal").innerText = Nombre;
-             idAct = id;
-             var modal = new bootstrap.Modal(document.getElementById("deleteModal"));
-             // Mostramos el modal
-             modal.show();
-         }
+        const lbl1 = document.createElement('label');
+        lbl1.className = 'form-label';
+        lbl1.setAttribute('for', `cmbAlumno${i}`);
+        lbl1.innerText = `Estudiante ${i}`;
 
-         function load(id) {
-             if (id == 0) {
-                 document.getElementById("registros").style =
-                     "display:block;visibility:visible;";
-                 document.getElementById("definir").style =
-                     "display:none;visibility:hidden;";
-             } else {
-                 document.getElementById("definir").style =
-                     "display:block;visibility:visible;";
-                 document.getElementById("registros").style =
-                     "display:none;visibility:hidden;";
-             }
-         }
+        const sel = document.createElement('select');
+        sel.name = `alumno${i}`;
+        sel.id = `cmbAlumno${i}`;
+        sel.className = 'form-control';
+        // Cada vez que cambie, volvemos a repartir opciones
+        sel.addEventListener('change', actualizarSelects);
 
-         function actualizarCampos(limite) {
+        // Guardamos las opciones completas como dato en el propio select
+        sel._todasOpciones = opcionesArr;
 
-             for (let i = 1; i <= limite; i++) {
-                 let campo = document.createElement('div');
-                 campo.className = 'row mb-3';
-                 campo.id = 'campoAlumno' + i;
+        col1.append(lbl1, sel);
 
-                 let col1 = document.createElement('div');
-                 col1.className = 'mb-3 col-6';
+        // === Columna 2: Input de descripción de tarea ===
+        const col2 = document.createElement('div');
+        col2.className = 'mb-3 col-6';
 
-                 let etiqueta1 = document.createElement('label');
-                 etiqueta1.className = 'form-label';
-                 etiqueta1.setAttribute('for', 'estudiante-c');
-                 etiqueta1.innerText = 'Estudiante ' + i;
+        const lbl2 = document.createElement('label');
+        lbl2.className = 'form-label';
+        lbl2.setAttribute('for', `txtTarea${i}`);
+        lbl2.innerText = 'Descripción de la tarea';
 
-                 let select = document.createElement('select');
-                 select.name = 'alumno' + i;
-                 select.id = 'cmbAlumno' + i;
-                 select.className = 'form-control';
-                 select.innerHTML = `<?php echo $_SESSION['opciones'] ?>`;
-                 select.addEventListener('change', actualizarSelects);
-                 select.value = '';
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.id = `txtTarea${i}`;
+        inp.name = `tarea${i}`;
+        inp.className = 'form-control';
 
-                 col1.appendChild(etiqueta1);
-                 col1.appendChild(select);
+        col2.append(lbl2, inp);
 
-                 let col2 = document.createElement('div');
-                 col2.className = 'mb-3 col-6';
-
-                 let etiqueta2 = document.createElement('label');
-                 etiqueta2.className = 'form-label';
-                 etiqueta2.setAttribute('for', 'nombre-c');
-                 etiqueta2.innerText = 'Descripción de la tarea ';
-
-                 let input = document.createElement('input');
-                 input.type = 'text';
-                 input.id = 'txtTarea' + i;
-                 input.className = 'form-control';
-                 input.name = 'tarea' + i;
-
-                 col2.appendChild(etiqueta2);
-                 col2.appendChild(input);
-
-                 campo.appendChild(col1);
-                 campo.appendChild(col2);
-                 let contenedor = document.getElementById('contenedorAlumnos');
-                 if (contenedor) {
-                     contenedor.appendChild(campo);
-                 }
-             }
-
-             actualizarSelects();
-
-         }
-
-
-         function actualizarSelects() {
-
-             //------------------------------------------SE OBTIENEN LOS SELECT CREADOS Y SUS VALORES SELECCIONADOS--------------------------
-             let selects = document.querySelectorAll('select[id^="cmbAlumno"]');
-             let selectedValues = Array.from(selects).map(select => select.value);
-
-             //------------------------------------------SE RECUPERAN LAS OPCIONES QUE OBTUBIMOS DE LA BD------------------------------
-             let opciones = `<?php echo $_SESSION['opciones'] ?>`;
-             //--------------SE CREA UN DIV TEMPORAR PARA COLOCAR LOS SELECT(OPCIONES) Y OBTENER LOS VALORES CON UN ARRAY.FROM---------------
-             let tempDiv = document.createElement('div');
-             tempDiv.innerHTML = opciones;
-             let opcionesArr = Array.from(tempDiv.querySelectorAll('option')).map(option => option.value);
-             //--------------------------------------------------------------------------------------------- 
-
-
-             selects.forEach(select => {
-                 let currentValue = select.value;
-                 //CREAR UN NUEVO ARREGLO CON LAS OPCIONES RESTANTES QUE NO INCLUYAN EL VALOR ACTUAL
-                 if (opcionesArr.includes(currentValue)) {
-                     OpcionesTemporales = opcionesArr.filter(value => value != currentValue);
-                 }
-                 //SE FILTRAN LAS OPCIONESTEMPORALES PARA TENER UN ARRAY NUEVO CON LOS VALORES RESTANTES QUE NO ESTAN EN LA SELECCION
-                 if (OpcionesGlobales) {
-                     OpcionesGlobales = OpcionesTemporales.filter(value => !selectedValues.includes(value));
-                     select.innerHTML = '<option>' + currentValue + '</option>';
-                 }
-                 //SE CREAN LAS NUEVAS OPCIONES PARA LOS SELECT RESTANTES
-                 OpcionesGlobales.forEach(optionValue => {
-                     let option = document.createElement('option');
-                     option.value = optionValue;
-                     option.textContent = optionValue;
-                     select.appendChild(option);
-                 });
-
-             });
-         }
-
-
-         function validarFormulario() {
-             let camposTarea = document.querySelectorAll('input[id^="txtTarea"]');
-             let selects = document.querySelectorAll('select[id^="cmbAlumno"]');
-             let NombreA = document.getElementById('NombreA');
-
-             let bandera = true;
-
-             if (NombreA.value.trim() == '') {
-                 window.location.replace('../main/act-main.php?mensaje=POR FAVOR LLENE EL NOMBRE DE LA ACTIVIDAD');
-                 bandera = false;
-             }
-             camposTarea.forEach(campo => {
-                 if (campo.value.trim() === '') {
-                     window.location.replace('../main/act-main.php?mensaje=POR FAVOR LLENE TODOS LOS CAMPOS DE TAREA');
-                     bandera = false;
-                 }
-             });
-             selects.forEach(campo => {
-                 if (campo.value.trim() === '') {
-                     bandera = false;
-                     window.location.replace('../main/act-main.php?mensaje=POR FAVOR LLENE TODOS LOS ALUMNOS');
-                 }
-             });
-             if (bandera) {
-                 return true;
-             } else {
-                 return false;
-             }
-         }
-     </script>
- <?php
+        // Montamos fila completa y la añadimos
+        row.append(col1, col2);
+        contenedor.appendChild(row);
     }
-    ?>
+
+    // 4) Después de crear todos, repartimos las opciones
+    actualizarSelects();
+}
+
+/**
+ * Reparte entre todos los <select id="cmbAlumno*"> las opciones
+ * de forma que el mismo alumno (value) no pueda seleccionarse dos veces.
+ * 
+ * Se basa en el array guardado en sel._todasOpciones.
+ */
+function actualizarSelects() {
+    // 1) Recogemos todos los selects creados
+    const selects = document.querySelectorAll('select[id^="cmbAlumno"]');
+
+    // 2) Leemos los valores ya elegidos
+    const elegidos = Array.from(selects).map(s => s.value);
+
+    // 3) Para cada select:
+    selects.forEach(select => {
+        // Recuperamos la lista completa de opciones que guardamos
+        const todas = select._todasOpciones;
+        const actual = select.value; // lo que ya esté seleccionado
+
+        // Disponibles = el actual (si hubiera) + el resto no elegidos
+        const disponibles = todas.filter(opt =>
+            opt.value === actual || !elegidos.includes(opt.value)
+        );
+
+
+        // 5) Restauramos el valor que ya tenía el select
+        select.value = actual;
+    });
+}
+
+// Valida que todos los campos estén completos
+function validarFormulario() {
+    const nombreA = document.getElementById('NombreA').value.trim();
+    if (!nombreA) {
+        window.location.replace('../main/act-main.php?mensaje=POR FAVOR LLENE EL NOMBRE DE LA ACTIVIDAD');
+        return false;
+    }
+    // Textos de tarea
+    const tareas = document.querySelectorAll('input[id^="txtTarea"]');
+    for (let t of tareas) {
+        if (!t.value.trim()) {
+            window.location.replace('../main/act-main.php?mensaje=POR FAVOR LLENE TODOS LOS CAMPOS DE TAREA');
+            return false;
+        }
+    }
+    // Selects de alumnos
+    const selects = document.querySelectorAll('select[id^="cmbAlumno"]');
+    for (let s of selects) {
+        if (!s.value.trim()) {
+            window.location.replace('../main/act-main.php?mensaje=POR FAVOR LLENE TODOS LOS ALUMNOS');
+            return false;
+        }
+    }
+    return true;
+}
+</script>
+<?php
+}
+?>

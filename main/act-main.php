@@ -40,40 +40,40 @@ session_start();
 if (isset($_SESSION['id_User'])) {
     include('../system/conexion.php');
 ?>
-    <!DOCTYPE html>
-    <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
-    <head>
-        <title>PICEL ~ RD</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" href="../ico/logo.ico">
-        <link href="../css/bootstrap.min.css" rel="stylesheet">
-        <link href="../css/estilo.css?v=<?php echo time(); ?>" rel="stylesheet">
-        <script src="../js/jquery-3.6.0.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<head>
+    <title>PICEL ~ RD</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="../ico/logo.ico">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/estilo.css?v=<?php echo time(); ?>" rel="stylesheet">
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    </head>
+</head>
 
-    <body>
-        <?php
+<body>
+    <?php
         require('menu.php');
         include('../main/JS/act-main.php');
         ?>
-        <div class="container margen">
-            <div class="row mt-3">
-                <div class="col"><button type="button" onclick="load(0);"
-                        class="mx-auto d-flex justify-content-center btn btn-success">Ver Registros</button></div>
-                <div class="col"><button type="button" onclick="load(1);"
-                        class="mx-auto d-flex justify-content-center btn btn-success">Definir Actividad</button></div>
+    <div class="container margen">
+        <div class="row mt-3">
+            <div class="col"><button type="button" onclick="load(0);"
+                    class="mx-auto d-flex justify-content-center btn btn-success">Ver Registros</button></div>
+            <div class="col"><button type="button" onclick="load(1);"
+                    class="mx-auto d-flex justify-content-center btn btn-success">Definir Actividad</button></div>
+        </div>
+        <div class="row" style="display:none;visibility:hidden;" id="registros">
+            <div class="col-12 pt-2 text-center">
+                <h3>Actividades</h3>
             </div>
-            <div class="row" style="display:none;visibility:hidden;" id="registros">
-                <div class="col-12 pt-2 text-center">
-                    <h3>Actividades</h3>
-                </div>
-                <div class="grid mx-auto col-md-12">
-                    <?php
+            <div class="grid mx-auto col-md-12">
+                <?php
 
                     $consulta = "SELECT id_Docente FROM docentes WHERE id_User = '" . $_SESSION['id_User'] . "'";
 
@@ -292,150 +292,151 @@ if (isset($_SESSION['id_User'])) {
 
 
                     ?>
-                </div>
             </div>
+        </div>
 
-            <div class="row" style="display:none;visibility:hidden;" id="definir">
-                <div class="col-12 pt-2 text-center">
-                    <h2>Definición de Actividades</h2>
-                </div>
-                <div class="grid mx-auto col-md-8" style="--bs-columns: 2;">
-                    <form method="POST" id="frm_act" action="../system/act-main.php" novalidate>
-                        <div class="row">
-                            <div class="col-12 pt-2 text-center">
-                                <h3>Nombre de la actividad</h3>
-                                <input type="text" name="NombreA" id="NombreA" class="form-control">
-                            </div>
-                            <div class="mb-3 col-6">
-                                <label for="evento-c" class="form-label">Evento</label>
-                                <?php
-                                //OBTENEMOS EL ID DEL DOCENTE PARA FILTRAR LOS EVENTOS
+        <div class="row" style="display:none;visibility:hidden;" id="definir">
+            <div class="col-12 pt-2 text-center">
+                <h2>Definición de Actividades</h2>
+            </div>
+            <div class="grid mx-auto col-md-8" style="--bs-columns: 2;">
+                <form method="POST" id="frm_act" action="../system/act-main.php" novalidate>
+                    <div class="row">
+                        <!-- Nombre de la Actividad -->
+                        <div class="col-12 pt-2 text-center">
+                            <h3>Nombre de la actividad</h3>
+                            <input type="text" name="NombreA" id="NombreA" class="form-control" required>
+                        </div>
+
+                        <!-- Selección de Evento -->
+                        <div class="mb-3 col-6">
+                            <label for="evento-c" class="form-label">Evento</label>
+                            <?php
+                                // Obtiene eventos del docente actual
                                 $query2 = "SELECT * FROM evento WHERE id_Docente = $id_Docente";
                                 echo '<select name="evento" id="cmbEvento" class="form-control" required>';
                                 if ($result = $link->query($query2)) {
                                     while ($row = $result->fetch_assoc()) {
-                                        $name = $row["nombre"];
-                                        $id = $row["id_Evento"];
-                                        echo '<option value="' . $id . '">' . $name . '</option>';
+                                        echo '<option value="' . $row["id_Evento"] . '">' . $row["nombre"] . '</option>';
                                     }
                                     $result->free();
                                 }
-                                echo ' </select>';
+                                echo '</select>';
                                 ?>
-                            </div>
-                            <div class="mb-3 col-6">
-                                <label for="canEstudiantes-c" class="form-label">Cantidad de estudiantes</label>
-                                <?php
-                                $query2 = "SELECT count(*) FROM Estudiantes WHERE id_Docente = $id_Docente";
-                                $query3 = "SELECT * FROM Estudiantes WHERE id_Docente = $id_Docente";
+                        </div>
+
+                        <!-- Cantidad de Estudiantes -->
+                        <div class="mb-3 col-6">
+                            <label for="canEstudiantes-c" class="form-label">Cantidad de estudiantes</label>
+                            <?php
+                                // Calcula cantidad de estudiantes disponibles
+                                $query3 = "SELECT COUNT(*) as total FROM Estudiantes WHERE id_Docente = $id_Docente";
+                                $result3 = $link->query($query3);
+                                $count = $result3->fetch_assoc()['total'];
+
+                                echo '<select name="canEstudiantes" id="noAlumnos" class="form-control" required>';
+                                for ($i = 1; $i <= $count; $i++) {
+                                    echo '<option value="' . $i . '">' . $i . '</option>';
+                                }
+                                echo '</select>';
+
+                                // Genera opciones de estudiantes para JS
+                                $query4 = "SELECT * FROM Estudiantes WHERE id_Docente = $id_Docente";
+                                $result4 = $link->query($query4);
                                 $opciones = '';
-                                if ($result = $link->query($query2)) {
-                                    $row = $result->fetch_assoc();
-                                    $count = $row['count(*)'];
-                                    echo '<select name="canEstudiantes" id="noAlumnos" class="form-control" required>';
-                                    for ($i = 1; $i <= $count; $i++) {
-                                        echo '<option value="' . $i . '">' . $i . '</option>';
-                                    }
-                                    echo '</select>';
-
-                                    if ($result2 = $link->query($query3)) {
-                                        while ($row2 = $result2->fetch_assoc()) {
-                                            $Estudiante = $row2["num_control"];
-                                            $id = $row2["id_Estudiante"];
-
-                                            $opciones .= '<option  value="'  . $Estudiante . '">' . $Estudiante . '</option>';
-                                        }
-                                        $result2->free();
-                                        $_SESSION['opciones'] = $opciones;
-                                    }
-                                    $result->free();
+                                while ($row = $result4->fetch_assoc()) {
+                                    $nc = $row["num_control"];
+                                    $nombre = $row["nombre"]; // o como tengas el nombre en BD
+                                    $opciones .= "<option value=\"{$nc}\">{$nombre} - {$nc}</option>";
                                 }
+                                $_SESSION['opciones'] = $opciones;
                                 ?>
-                            </div>
                         </div>
+                    </div>
 
-                        <!--ALUMNOS-->
-                        <div class="contenedor">
-                            <div id="contenedorAlumnos">
+                    <!-- Contenedor Dinámico para Estudiantes -->
+                    <div class="contenedor">
+                        <div id="contenedorAlumnos"></div> <!-- Aquí se inyectarán los campos -->
+                    </div>
 
-                            </div>
+                    <!-- Fecha de Inicio -->
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="nombre-c" class="form-label">Fecha Inicio</label>
+                            <input type="date" class="form-control" name="fechai" value="<?= date('Y-m-d') ?>"
+                                min="2020-01-01" max="2030-12-31" required>
                         </div>
-                        <div class="row">
-                            <div class="mb-3 col-6">
-                                <label for="nombre-c" class="form-label">Fecha Inicio</label>
-                                <input type="date" class="form-control" name="fechai" value="2023-01-15" min="2020-01-01"
-                                    max="2030-12-31" required>
-                            </div>
+                    </div>
 
-                        </div>
-                        <div class="pt-2 d-flex justify-content-center">
-                            <button type="submit" class="btn btn-picel">Registrar</button>
-                        </div>
-                    </form>
+                    <!-- Botón de Registro -->
+                    <div class="pt-2 d-flex justify-content-center">
+                        <button type="submit" class="btn btn-picel">Registrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true"
+        style="border: 1px solid black;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #5fbc18; position: relative;">
+                    <div style="position: absolute; left: 10px;">
+                        <img src="../imgs/logorecortado.png" class="img-fluid" alt="PICEL" width="55">
+                    </div>
+                    <h5 class="modal-title w-100 text-center" id="deleteModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        ¿Estás seguro de que deseas eliminar a
+                        <strong>
+                            <label id="Nombre-Modal">
+                            </label>
+                        </strong>
+                        ?
+                    </p>
+                    <label>Esta acción no se puede deshacer.</label>
+                </div>
+                <div class="modal-footer" style=" background-color: #5fbc18;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border: 1px solid black;">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete"
+                        style="border: 1px solid black; ">Eliminar</button>
                 </div>
             </div>
         </div>
-
-        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true"
-            style="border: 1px solid black;">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header" style="background-color: #5fbc18; position: relative;">
-                        <div style="position: absolute; left: 10px;">
-                            <img src="../imgs/logorecortado.png" class="img-fluid" alt="PICEL" width="55">
-                        </div>
-                        <h5 class="modal-title w-100 text-center" id="deleteModalLabel">Confirmar Eliminación</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>
-                            ¿Estás seguro de que deseas eliminar a
-                            <strong>
-                                <label id="Nombre-Modal">
-                                </label>
-                            </strong>
-                            ?
-                        </p>
-                        <label>Esta acción no se puede deshacer.</label>
-                    </div>
-                    <div class="modal-footer" style=" background-color: #5fbc18;">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            style="border: 1px solid black;">Cancelar</button>
-                        <button type="button" class="btn btn-danger" id="confirmDelete"
-                            style="border: 1px solid black; ">Eliminar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <?php
+    </div>
+    <?php
         if (isset($_GET['mensaje'])) {
         ?>
-            <div class="modal fade" id="ModalMensaje" style="border: 1px solid black;" tabindex="-3">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header" style="background-color: #5fbc18; position: relative;">
-                            <div style="position: absolute; left: 10px;">
-                                <img src="../imgs/logorecortado.png" class="img-fluid" alt="PICEL" width="55">
-                            </div>
-                            <h5 class="modal-title w-100 text-center">MENSAJE</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p id="LabelModal"><?php
+    <div class="modal fade" id="ModalMensaje" style="border: 1px solid black;" tabindex="-3">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #5fbc18; position: relative;">
+                    <div style="position: absolute; left: 10px;">
+                        <img src="../imgs/logorecortado.png" class="img-fluid" alt="PICEL" width="55">
+                    </div>
+                    <h5 class="modal-title w-100 text-center">MENSAJE</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="LabelModal"><?php
                                                 if (isset($_GET['mensaje'])) {
                                                     echo $_GET['mensaje'];
                                                 } else {
                                                     echo "";
                                                 }
                                                 ?></p>
-                        </div>
-                        <div class="modal-footer" style=" background-color: #5fbc18;">
-                            <h6>Da clic fuera del mensaje para continuar</h6>
-                        </div>
-                    </div>
+                </div>
+                <div class="modal-footer" style=" background-color: #5fbc18;">
+                    <h6>Da clic fuera del mensaje para continuar</h6>
                 </div>
             </div>
-        <?php
+        </div>
+    </div>
+    <?php
             echo '   <script> 
             document.addEventListener("DOMContentLoaded", function() {
             // Seleccionamos el modal
@@ -447,35 +448,35 @@ if (isset($_SESSION['id_User'])) {
         }
         ?>
 
-        <?php
+    <?php
         include('footer.php');
 
         ?>
-    </body>
-    <style>
-        table {
-            width: 100%;
-        }
+</body>
+<style>
+table {
+    width: 100%;
+}
 
-        td {
-            text-align: center;
-            vertical-align: middle;
-        }
+td {
+    text-align: center;
+    vertical-align: middle;
+}
 
-        td button {
-            display: flex !important;
-            flex-direction: column !important;
-        }
-    </style>
+td button {
+    display: flex !important;
+    flex-direction: column !important;
+}
+</style>
 
-    </html>
+</html>
 <?php
 } else {
 ?>
-    <script>
-        alert('No tienes autorización para ingresar a esta página');
-        window.location.href = "../index.php";
-    </script>
+<script>
+alert('No tienes autorización para ingresar a esta página');
+window.location.href = "../index.php";
+</script>
 <?php
 }
 ?>

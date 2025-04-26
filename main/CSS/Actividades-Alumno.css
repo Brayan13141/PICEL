@@ -7,12 +7,6 @@
     transition: all 0.3s ease;
     background-color: #fff;
 }
-
-.actividad-card:hover {
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-    background-color: #f0f1f1bc;
-}
-
 .actividad-header {
     font-size: 1.4rem;
     font-weight: bold;
