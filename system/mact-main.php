@@ -45,7 +45,7 @@ if (isset($_POST['accion']) && isset($_POST['id_tarea'])) {
     try {
         if ($accion === "validar") {
             // Actualiza el estado de la tarea a 2 (Validado)
-            $query = "UPDATE tarea SET Estatus = 1 WHERE id_Tarea = '$id_tarea'";
+            $query = "UPDATE tarea SET validado = 1 WHERE id_Tarea = '$id_tarea'";
             if ($link->query($query)) {
                 header("Location: " . $redirect . "&mensaje=TAREA VALIDADA");
                 exit();
@@ -73,7 +73,7 @@ if (isset($_POST['accion']) && isset($_POST['id_tarea'])) {
                 header("Location: " . $redirect . "&mensaje=TAREA DENEGADA Y PENDIENTE");
                 exit();
             } else {
-                header("Location: " . $redirect . "&mensaje= ERROR AL DENEGAR LA TAREA");
+                header("Location: " . $redirect . "&mensaje=INTENTE DE NUEVO");
                 exit();
             }
         } else {
