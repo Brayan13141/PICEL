@@ -115,6 +115,10 @@ if ($_SESSION['id_User']) {
                             t.id_Tarea,
                             t.nombre,
                             t.Estatus AS estado,
+                            CONCAT(est.nombre, ' ', est.apellidoP, ' ', est.apellidoM) AS nombre_completo,
+                            t.id_Tarea,
+                            t.nombre,
+                            t.validado,
                             t.descripcion,
                             t.Anotaciones,
                             (
@@ -155,19 +159,28 @@ if ($_SESSION['id_User']) {
                             $Nombreact        = $row["nombre"];
                             $name_completo    = $row["nombre_completo"];
                             $descripcion      = $row["descripcion"];
-                            $estatus          = $row["estado"] ? "Entregado" : "Pendiente";
+
+                            $entregado    = ! empty($row["direccion_archivo"]);
+                            $validado     = (bool) $row["validado"];
+
                             $anotaciones      = $row["Anotaciones"];
                             $direccion_archivo = $row["direccion_archivo"] ?? "SIN ENTREGA";
-
+                            if ($validado) {
+                                $estadoLabel = '<span class="badge bg-success">Validado</span>';
+                            } elseif ($entregado) {
+                                $estadoLabel = '<span class="badge bg-warning text-dark">Entregado</span>';
+                            } else {
+                                $estadoLabel = '<span class="badge bg-secondary">Pendiente</span>';
+                            }
                             echo '<tr>
                                 <td>' . htmlspecialchars($name_completo) . '</td>
                                 <td>' . htmlspecialchars($Nombreact) . '</td>
                                 <td>' . htmlspecialchars($descripcion) . '</td>
-                                <td>' . $estatus . '</td>
+                                <td>' . $estadoLabel . '</td>
                                 <td>
                                     <div class="text-center">';
                             // Mostrar preview y descarga si está "Entregado" y existe archivo
-                            if ($estatus == "Entregado" && !empty($direccion_archivo)) {
+                            if ($entregado && !empty($direccion_archivo)) {
                                 $extension = strtolower(pathinfo($direccion_archivo, PATHINFO_EXTENSION));
                                 // Imagen
                                 if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
@@ -204,25 +217,27 @@ if ($_SESSION['id_User']) {
                                 <td>
                                     <div class="text-center">';
                             // Si la tarea está entregada, se muestran los formularios para validar y denegar
-                            if ($estatus == "Entregado") {
+                            // Mostrar botones solo si hay entrega y aún NO está validada
+                            if ($entregado && ! $validado) {
                                 echo '
-                            <form method="POST" action="../system/mact-main.php" style="display:inline;" onsubmit="return confirmAndSubmit(event, \'¿DESEAS VALIDAR ESTA TAREA?\');">
-                                <input type="hidden" name="id_tarea" value="' . intval($idTarea) . '">
-                                <input type="hidden" name="accion" value="validar">
-                                <input type="hidden" name="id_E" value="' . htmlspecialchars($id_Evento) . '">
-                                <input type="hidden" name="id_D" value="' . htmlspecialchars($id_Docente) . '">
-                                <input type="hidden" name="id_A" value="' . htmlspecialchars($id_Act) . '">
-                                <button type="submit" class="btn btn-success btn-sm mr-1">Validar</button>
-                            </form>
-                            <form method="POST" action="../system/mact-main.php" style="display:inline;" onsubmit="return confirmAndSubmit(event, \'¿DESEA DENEGAR ESTA TAREA Y MARCARLA COMO PENDIENTE?\');">
-                                <input type="hidden" name="id_tarea" value="' . intval($idTarea) . '">
-                                <input type="hidden" name="accion" value="denegar">
-                                <input type="hidden" name="id_E" value="' . htmlspecialchars($id_Evento) . '">
-                                <input type="hidden" name="id_D" value="' . htmlspecialchars($id_Docente) . '">
-                                <input type="hidden" name="id_A" value="' . htmlspecialchars($id_Act) . '">
-                                <button type="submit" class="btn btn-danger btn-sm">Denegar</button>
-                            </form>';
+                                <form method="POST" action="../system/mact-main.php" style="display:inline;" onsubmit="return confirmAndSubmit(event, \'¿DESEAS VALIDAR ESTA TAREA?\');">
+                                    <input type="hidden" name="id_tarea" value="' . intval($idTarea) . '">
+                                    <input type="hidden" name="accion" value="validar">
+                                    <input type="hidden" name="id_E" value="' . htmlspecialchars($id_Evento) . '">
+                                    <input type="hidden" name="id_D" value="' . htmlspecialchars($id_Docente) . '">
+                                    <input type="hidden" name="id_A" value="' . htmlspecialchars($id_Act) . '">
+                                    <button type="submit" class="btn btn-success btn-sm mr-1">Validar</button>
+                                </form>
+                                <form method="POST" action="../system/mact-main.php" style="display:inline;" onsubmit="return confirmAndSubmit(event, \'¿DESEA DENEGAR ESTA TAREA Y MARCARLA COMO PENDIENTE?\');">
+                                    <input type="hidden" name="id_tarea" value="' . intval($idTarea) . '">
+                                    <input type="hidden" name="accion" value="denegar">
+                                    <input type="hidden" name="id_E" value="' . htmlspecialchars($id_Evento) . '">
+                                    <input type="hidden" name="id_D" value="' . htmlspecialchars($id_Docente) . '">
+                                    <input type="hidden" name="id_A" value="' . htmlspecialchars($id_Act) . '">
+                                    <button type="submit" class="btn btn-danger btn-sm">Denegar</button>
+                                </form>';
                             }
+
                             echo '      </div>
                                 </td>
                               </tr>';
