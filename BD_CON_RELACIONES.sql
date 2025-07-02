@@ -101,6 +101,7 @@ CREATE TABLE `tarea` (
   `id_Actividad` INT NOT NULL,
   `id_Estudiante` INT NOT NULL,
   `Estatus` TINYINT(1) NOT NULL DEFAULT 0,
+  `validado` TINYINT(1) NOT NULL DEFAULT 0,
   `Anotaciones` VARCHAR(300) NOT NULL,
   PRIMARY KEY (`id_Tarea`),
   FOREIGN KEY (`id_Actividad`) REFERENCES `actividades_asignadas`(`id_Actividades`) ON DELETE CASCADE,
